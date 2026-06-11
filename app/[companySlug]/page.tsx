@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   collection,
   doc,
@@ -58,6 +59,101 @@ function stripHtml(html?: string) {
     .replace(/&nbsp;/g, " ")
     .trim();
 }
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { companySlug } = await params;
+
+  const listingsQuery = query(
+    collection(db, "listings"),
+    where("companySlug", "==", companySlug),
+    where("status", "==", "active")
+  );
+
+  const snapshot = await getDocs(listingsQuery);
+
+  const listings = snapshot.docs.map((listingDoc) => ({
+    ...(listingDoc.data() as Listing),
+    id: listingDoc.id,
+  }));
+
+  let client: Client | null = null;
+
+  const clientId = listings[0]?.clientId;
+
+  if (clientId) {
+    const clientSnap = await getDoc(doc(db, "clients", clientId));
+
+    if (clientSnap.exists()) {
+      client = clientSnap.data() as Client;
+    }
+  }
+
+  const companyName =
+    client?.company_name || listings[0]?.companyName || formatSlug(companySlug);
+
+  const companyAddress = client?.address || listings[0]?.address || "";
+
+  const featuredImage =
+    listings.find((listing) => listing.featuredImage)?.featuredImage || "";
+
+  const listingCount = listings.length;
+
+  const pageTitle = `${companyName} Listings | Zane Listings`;
+
+  const pageDescription =
+    listingCount > 0
+      ? `Explore ${listingCount} active listing${
+          listingCount === 1 ? "" : "s"
+        } from ${companyName}${companyAddress ? ` in ${companyAddress}` : ""}. View available properties, prices, locations, and details.`
+      : `View listings from ${companyName}. Browse available properties, locations, prices, and contact details.`;
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://your-domain.com";
+
+  const pageUrl = `${siteUrl}/${companySlug}`;
+
+  return {
+    title: pageTitle,
+    description: pageDescription,
+    alternates: {
+      canonical: pageUrl,
+    },
+    openGraph: {
+      title: pageTitle,
+      description: pageDescription,
+      url: pageUrl,
+      siteName: "Zane Listings",
+      type: "website",
+      images: featuredImage
+        ? [
+            {
+              url: featuredImage,
+              width: 1200,
+              height: 630,
+              alt: `${companyName} listings`,
+            },
+          ]
+        : [],
+    },
+    twitter: {
+      card: featuredImage ? "summary_large_image" : "summary",
+      title: pageTitle,
+      description: pageDescription,
+      images: featuredImage ? [featuredImage] : [],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+      },
+    },
+  };
+}
+
 
 export default async function CompanyListingsPage({ params }: PageProps) {
   const { companySlug } = await params;

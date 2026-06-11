@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   collection,
@@ -52,6 +53,131 @@ function formatPeso(price?: string) {
   }
 
   return `₱${cleanPrice}`;
+}
+
+function stripHtml(html?: string) {
+  if (!html) return "";
+
+  return html
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { companySlug, listingSlug } = await params;
+
+  const listingQuery = query(
+    collection(db, "listings"),
+    where("companySlug", "==", companySlug),
+    where("listingSlug", "==", listingSlug),
+    where("status", "==", "active")
+  );
+
+  const snapshot = await getDocs(listingQuery);
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    ? process.env.NEXT_PUBLIC_SITE_URL
+    : process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
+
+  const pageUrl = `${siteUrl}/${companySlug}/${listingSlug}`;
+
+  if (snapshot.empty) {
+    return {
+      title: "Listing Not Found | Zane Listings",
+      description: "The listing you are looking for is no longer available.",
+      alternates: {
+        canonical: pageUrl,
+      },
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const listing = {
+    ...(snapshot.docs[0].data() as Listing),
+    id: snapshot.docs[0].id,
+  };
+
+  let client: Client | null = null;
+
+  if (listing.clientId) {
+    const clientSnap = await getDoc(doc(db, "clients", listing.clientId));
+
+    if (clientSnap.exists()) {
+      client = clientSnap.data() as Client;
+    }
+  }
+
+  const companyName =
+    client?.company_name || listing.companyName || "Company Listings";
+
+  const title = listing.title || "Listing";
+
+  const price = listing.price ? formatPeso(listing.price) : "";
+  const address = listing.address || client?.address || "";
+  const category = listing.listingCategory || listing.type || "listing";
+
+  const cleanText = stripHtml(listing.description);
+
+  const pageTitle = `${title} | ${companyName}`;
+
+  const pageDescription = cleanText
+    ? cleanText.slice(0, 155)
+    : `${title} is an active ${category} from ${companyName}${
+        address ? ` located at ${address}` : ""
+      }${price ? ` with price ${price}` : ""}. View details, photos, and contact information.`;
+
+  const featuredImage =
+    listing.featuredImage ||
+    (Array.isArray(listing.sliderImages) ? listing.sliderImages[0] : "");
+
+  return {
+    title: pageTitle,
+    description: pageDescription,
+    alternates: {
+      canonical: pageUrl,
+    },
+    openGraph: {
+      title: pageTitle,
+      description: pageDescription,
+      url: pageUrl,
+      siteName: "Zane Listings",
+      type: "article",
+      images: featuredImage
+        ? [
+            {
+              url: featuredImage,
+              width: 1200,
+              height: 630,
+              alt: title,
+            },
+          ]
+        : [],
+    },
+    twitter: {
+      card: featuredImage ? "summary_large_image" : "summary",
+      title: pageTitle,
+      description: pageDescription,
+      images: featuredImage ? [featuredImage] : [],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+      },
+    },
+  };
 }
 
 export default async function PublicListingPage({ params }: PageProps) {
