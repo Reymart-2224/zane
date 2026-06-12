@@ -267,13 +267,7 @@ export default function HomePage() {
 
           <div className="relative mx-auto max-w-[520px] rounded-[36px] border border-white/10 bg-white/[0.04] p-6 shadow-2xl backdrop-blur-xl">
             <div className="rounded-[28px] border border-white/10 bg-[#081827]/80 p-7">
-              <div className="mb-6 flex items-center justify-between">
-               
-                <span className="text-xs uppercase tracking-[0.3em] text-white/35">
-                TURNING IDEAS INTO REALITY
-                </span>
-              </div>
-
+          
               <div className="flex justify-center py-10">
                 <Image
                   src={zaneWindow}
