@@ -14,6 +14,14 @@ type PageProps = {
   params: Promise<{
     companySlug: string;
   }>;
+  searchParams?: Promise<{
+    q?: string;
+    category?: string;
+    type?: string;
+    min?: string;
+    max?: string;
+    sort?: string;
+  }>;
 };
 
 type Listing = {
@@ -34,6 +42,10 @@ type Listing = {
   beds?: string;
   baths?: string;
   area?: string;
+  createdAt?: {
+    seconds?: number;
+    nanoseconds?: number;
+  };
 };
 
 type Client = {
@@ -58,6 +70,47 @@ function stripHtml(html?: string) {
     .replace(/<[^>]*>/g, "")
     .replace(/&nbsp;/g, " ")
     .trim();
+}
+
+function getPriceNumber(price?: string) {
+  if (!price) return 0;
+
+  const cleanPrice = String(price).replace(/[^\d.]/g, "");
+  const priceNumber = Number(cleanPrice);
+
+  return Number.isFinite(priceNumber) ? priceNumber : 0;
+}
+
+function formatPeso(price?: string) {
+  if (!price) return "Contact";
+
+  const cleanPrice = String(price).trim();
+
+  if (cleanPrice.startsWith("₱")) {
+    return cleanPrice;
+  }
+
+  return `₱${cleanPrice}`;
+}
+
+function buildQueryString(
+  currentParams: Record<string, string>,
+  updates: Record<string, string>
+) {
+  const params = new URLSearchParams();
+
+  Object.entries({
+    ...currentParams,
+    ...updates,
+  }).forEach(([key, value]) => {
+    if (value && value !== "all") {
+      params.set(key, value);
+    }
+  });
+
+  const queryString = params.toString();
+
+  return queryString ? `?${queryString}` : "";
 }
 
 export async function generateMetadata({
@@ -106,7 +159,9 @@ export async function generateMetadata({
     listingCount > 0
       ? `Explore ${listingCount} active listing${
           listingCount === 1 ? "" : "s"
-        } from ${companyName}${companyAddress ? ` in ${companyAddress}` : ""}. View available properties, prices, locations, and details.`
+        } from ${companyName}${
+          companyAddress ? ` in ${companyAddress}` : ""
+        }. View available properties, prices, locations, and details.`
       : `View listings from ${companyName}. Browse available properties, locations, prices, and contact details.`;
 
   const siteUrl =
@@ -154,9 +209,19 @@ export async function generateMetadata({
   };
 }
 
-
-export default async function CompanyListingsPage({ params }: PageProps) {
+export default async function CompanyListingsPage({
+  params,
+  searchParams,
+}: PageProps) {
   const { companySlug } = await params;
+  const filters = (await searchParams) || {};
+
+  const keyword = filters.q || "";
+  const categoryFilter = filters.category || "all";
+  const typeFilter = filters.type || "all";
+  const minPrice = filters.min || "";
+  const maxPrice = filters.max || "";
+  const sortBy = filters.sort || "newest";
 
   const listingsQuery = query(
     collection(db, "listings"),
@@ -190,41 +255,94 @@ export default async function CompanyListingsPage({ params }: PageProps) {
   const companyEmail = client?.email || "";
   const companyAddress = client?.address || "";
 
+  const categories = Array.from(
+    new Set(
+      listings
+        .map((listing) => listing.listingCategory)
+        .filter(Boolean) as string[]
+    )
+  );
+
+  const types = Array.from(
+    new Set(listings.map((listing) => listing.type).filter(Boolean) as string[])
+  );
+
+  const currentParams = {
+    q: keyword,
+    category: categoryFilter,
+    type: typeFilter,
+    min: minPrice,
+    max: maxPrice,
+    sort: sortBy,
+  };
+
+  const filteredListings = listings
+    .filter((listing) => {
+      const searchValue = keyword.toLowerCase().trim();
+
+      const matchesKeyword =
+        !searchValue ||
+        listing.title?.toLowerCase().includes(searchValue) ||
+        listing.address?.toLowerCase().includes(searchValue) ||
+        listing.type?.toLowerCase().includes(searchValue) ||
+        stripHtml(listing.description).toLowerCase().includes(searchValue);
+
+      const matchesCategory =
+        categoryFilter === "all" ||
+        listing.listingCategory === categoryFilter;
+
+      const matchesType = typeFilter === "all" || listing.type === typeFilter;
+
+      const listingPrice = getPriceNumber(listing.price);
+
+      const matchesMin =
+        !minPrice || listingPrice >= Number(String(minPrice).replace(/\D/g, ""));
+
+      const matchesMax =
+        !maxPrice || listingPrice <= Number(String(maxPrice).replace(/\D/g, ""));
+
+      return (
+        matchesKeyword &&
+        matchesCategory &&
+        matchesType &&
+        matchesMin &&
+        matchesMax
+      );
+    })
+    .sort((a, b) => {
+      if (sortBy === "price-low") {
+        return getPriceNumber(a.price) - getPriceNumber(b.price);
+      }
+
+      if (sortBy === "price-high") {
+        return getPriceNumber(b.price) - getPriceNumber(a.price);
+      }
+
+      const aTime = a.createdAt?.seconds || 0;
+      const bTime = b.createdAt?.seconds || 0;
+
+      return bTime - aTime;
+    });
+
   return (
-   <main className="min-h-screen bg-[#f8fafc] text-[#111827] flex flex-col listings">
+    <main className="flex min-h-screen flex-col bg-[#f8fafc] text-[#111827] listings">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto max-w-[1120px] px-4 py-6">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            {/* Company */}
             <div>
-            
-
               <h1 className="text-3xl font-bold text-[#111827] md:text-4xl">
                 {companyName}
               </h1>
 
               {companyAddress && (
-            <p className="mt-2 flex max-w-xl items-start gap-2 text-sm leading-relaxed text-gray-500">
-  <svg
-    className="mt-0.5 h-4 w-4 shrink-0 text-[var(--zl-primary)]"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" />
-    <circle cx="12" cy="10" r="3" />
-  </svg>
-
-  <span>{companyAddress}</span>
-</p>
+                <p className="mt-2 flex max-w-xl items-start gap-2 text-sm leading-relaxed text-gray-500">
+                  <MapPinIcon />
+                  <span>{companyAddress}</span>
+                </p>
               )}
             </div>
 
-            {/* Contact */}
             <div className="w-full rounded-2xl border border-gray-200 bg-[#f8fafc] p-4 md:w-auto md:min-w-[340px]">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
                 Contact Details
@@ -267,7 +385,7 @@ export default async function CompanyListingsPage({ params }: PageProps) {
       </header>
 
       {/* Listings */}
-      <section className="mx-auto max-w-[1120px] w-full px-4 py-10 flex-1">
+      <section className="mx-auto w-full max-w-[1120px] flex-1 px-4 py-10">
         <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold text-[#111827]">Our Listings</h2>
@@ -277,9 +395,135 @@ export default async function CompanyListingsPage({ params }: PageProps) {
           </div>
 
           <span className="w-fit rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-[#296589] shadow-sm">
-            {listings.length} active listing{listings.length === 1 ? "" : "s"}
+            {filteredListings.length} result
+            {filteredListings.length === 1 ? "" : "s"}
           </span>
         </div>
+
+        {/* Filters - hidden by default */}
+<details className="mb-8 rounded-2xl border border-gray-200 bg-white shadow-sm">
+  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-4 text-sm font-semibold text-[#296589]">
+    <span>Filter Listings</span>
+
+    <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#296589]">
+      Show / Hide
+    </span>
+  </summary>
+
+  <form method="GET" className="border-t border-gray-100 p-4">
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-6">
+      <div className="lg:col-span-2">
+        <label className="mb-1 block text-xs font-semibold text-gray-500">
+          Search
+        </label>
+        <input
+          type="text"
+          name="q"
+          defaultValue={keyword}
+          placeholder="Search title, location, type..."
+          className="h-11 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm outline-none focus:border-[#296589] focus:ring-2 focus:ring-[#296589]/10"
+        />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-xs font-semibold text-gray-500">
+          Category
+        </label>
+        <select
+          name="category"
+          defaultValue={categoryFilter}
+          className="h-11 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm outline-none focus:border-[#296589] focus:ring-2 focus:ring-[#296589]/10"
+        >
+          <option value="all">All Categories</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {formatSlug(category)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="mb-1 block text-xs font-semibold text-gray-500">
+          Type
+        </label>
+        <select
+          name="type"
+          defaultValue={typeFilter}
+          className="h-11 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm outline-none focus:border-[#296589] focus:ring-2 focus:ring-[#296589]/10"
+        >
+          <option value="all">All Types</option>
+          {types.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="mb-1 block text-xs font-semibold text-gray-500">
+          Min Price
+        </label>
+        <input
+          type="number"
+          name="min"
+          defaultValue={minPrice}
+          placeholder="Min"
+          className="h-11 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm outline-none focus:border-[#296589] focus:ring-2 focus:ring-[#296589]/10"
+        />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-xs font-semibold text-gray-500">
+          Max Price
+        </label>
+        <input
+          type="number"
+          name="max"
+          defaultValue={maxPrice}
+          placeholder="Max"
+          className="h-11 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm outline-none focus:border-[#296589] focus:ring-2 focus:ring-[#296589]/10"
+        />
+      </div>
+    </div>
+
+    <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto]">
+      <div>
+        <label className="mb-1 block text-xs font-semibold text-gray-500">
+          Sort
+        </label>
+        <select
+          name="sort"
+          defaultValue={sortBy}
+          className="h-11 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm outline-none focus:border-[#296589] focus:ring-2 focus:ring-[#296589]/10"
+        >
+          <option value="newest">Newest</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+        </select>
+      </div>
+
+      <div className="flex items-end">
+        <button
+          type="submit"
+          className="h-11 w-full rounded-xl bg-[#296589] px-6 text-sm font-semibold text-white transition hover:opacity-90 md:w-auto"
+        >
+          Apply Filters
+        </button>
+      </div>
+
+      <div className="flex items-end">
+        <Link
+          href={`/${companySlug}`}
+          className="flex h-11 w-full items-center justify-center rounded-xl border border-gray-200 bg-white px-6 text-sm font-semibold text-[#296589] transition hover:bg-blue-50 md:w-auto"
+        >
+          Reset
+        </Link>
+      </div>
+    </div>
+  </form>
+</details>
 
         {listings.length === 0 && (
           <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center shadow-sm">
@@ -292,8 +536,26 @@ export default async function CompanyListingsPage({ params }: PageProps) {
           </div>
         )}
 
+        {listings.length > 0 && filteredListings.length === 0 && (
+          <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center shadow-sm">
+            <h3 className="text-lg font-bold text-[#111827]">
+              No matching listings
+            </h3>
+            <p className="mt-2 text-sm text-gray-500">
+              Try changing your search or filter options.
+            </p>
+
+            <Link
+              href={`/${companySlug}`}
+              className="mt-5 inline-flex rounded-full bg-[#296589] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            >
+              Clear Filters
+            </Link>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {listings.map((listing) => {
+          {filteredListings.map((listing) => {
             const excerpt = stripHtml(listing.description).slice(0, 95);
 
             return (
@@ -329,28 +591,17 @@ export default async function CompanyListingsPage({ params }: PageProps) {
                         {listing.title}
                       </h3>
 
-                     <p className="mt-1 flex items-center gap-1.5 truncate text-sm text-gray-500">
-  <svg
-    className="h-4 w-4 shrink-0 text-[var(--zl-primary)]"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" />
-    <circle cx="12" cy="10" r="3" />
-  </svg>
+                      <p className="mt-1 flex items-center gap-1.5 truncate text-sm text-gray-500">
+                        <MapPinIcon />
 
-  <span className="truncate">
-    {listing.address || "Location not specified"}
-  </span>
-</p>
+                        <span className="truncate">
+                          {listing.address || "Location not specified"}
+                        </span>
+                      </p>
                     </div>
 
                     <p className="shrink-0 text-base font-bold text-[#111827]">
-                      ₱{listing.price || "Contact"}
+                      {formatPeso(listing.price)}
                     </p>
                   </div>
 
@@ -391,5 +642,22 @@ export default async function CompanyListingsPage({ params }: PageProps) {
         </div>
       </footer>
     </main>
+  );
+}
+
+function MapPinIcon() {
+  return (
+    <svg
+      className="mt-0.5 h-4 w-4 shrink-0 text-[var(--zl-primary)]"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
   );
 }

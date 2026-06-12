@@ -30,6 +30,10 @@ body {
 }
 
 
+.listings a.text-white{
+  color: #ffffff!important;
+}
+ 
 
 /* Zane Listing Image Zoom */
 .zl-image-gallery {
