@@ -1,5 +1,6 @@
 import Link from "next/link";
 import MessengerChatBox from "@/components/MessengerChatBox";
+import MessengerFloatingBox from "@/components/MessengerFloatingBox";
 import type { Metadata } from "next";
 import {
   collection,
@@ -259,7 +260,8 @@ const companyEmail = client?.email || "";
 const companyAddress = client?.address || "";
 const facebookMessenger = client?.facebookMessenger || "";
 const facebookPageId = client?.facebookPageId || "";
-
+console.log("FACEBOOK PAGE ID:", facebookPageId);
+console.log("FACEBOOK MESSENGER:", facebookMessenger);
   const categories = Array.from(
     new Set(
       listings
@@ -673,17 +675,12 @@ const facebookPageId = client?.facebookPageId || "";
       </footer>
             <MessengerChatBox pageId={facebookPageId} />
 
-      {facebookMessenger && (
-        <a
-          href={`https://m.me/${facebookMessenger}`}
-          target="_blank"
-          rel="noopener noreferrer {facebookPageId} "
-          aria-label="Message on Facebook Messenger"
-          className="fixed bottom-5 right-5 z-[9999] flex h-14 w-14 items-center justify-center rounded-full bg-[#0084ff] text-white shadow-[0_12px_35px_rgba(0,132,255,0.35)] transition hover:scale-105 hover:bg-[#0077e6]"
-        >
-          <MessengerIcon />
-        </a>
-      )}
+   {facebookMessenger && (
+<MessengerFloatingBox
+  messengerUsername={facebookMessenger}
+  companyName={companyName}
+/>
+)}
     </main>
   );
 }
