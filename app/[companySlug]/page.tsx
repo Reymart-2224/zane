@@ -677,7 +677,7 @@ const facebookPageId = client?.facebookPageId || "";
         <a
           href={`https://m.me/${facebookMessenger}`}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener noreferrer facebookPageId"
           aria-label="Message on Facebook Messenger"
           className="fixed bottom-5 right-5 z-[9999] flex h-14 w-14 items-center justify-center rounded-full bg-[#0084ff] text-white shadow-[0_12px_35px_rgba(0,132,255,0.35)] transition hover:scale-105 hover:bg-[#0077e6]"
         >
