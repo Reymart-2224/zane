@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import MessengerChatBox from "@/components/MessengerChatBox";
+import MessengerFloatingBox from "@/components/MessengerFloatingBox";
 import {
   collection,
   doc,
@@ -242,9 +243,9 @@ const facebookPageId = client?.facebookPageId || "";
   ];
 
   return (
-    <main className="flex min-h-screen flex-col bg-[#f8fafc] text-[#111827]">
+    <main className="flex min-h-screen flex-col bg-gradient-to-b from-[#d8f3ff] via-[#edf9ff] to-white  text-[#111827] listings">
       {/* Header */}
-     <header className="border-b border-white/10 bg-gradient-to-r from-[#143747] to-[#296589]">
+        <header className="border-b border-white/20 bg-gradient-to-br from-[#0f2d3a] via-[#296589] to-[#1d4f63] shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(0,0,0,0.35),0_12px_35px_rgba(0,0,0,0.18)]">
         <div className="mx-auto max-w-[1120px] px-4 py-6">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             {/* Left */}
@@ -412,36 +413,18 @@ const facebookPageId = client?.facebookPageId || "";
         </p>
         </div>
       </footer>
-<MessengerChatBox pageId={facebookPageId} />
+   <MessengerChatBox pageId={facebookPageId} />
 
-{!facebookPageId && facebookMessenger && (
-  <a
-    href={`https://m.me/${facebookMessenger}`}
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label="Message on Facebook Messenger"
-    className="fixed bottom-5 right-5 z-[9999] flex h-14 w-14 items-center justify-center rounded-full bg-[#0084ff] text-white shadow-[0_12px_35px_rgba(0,132,255,0.35)] transition hover:scale-105 hover:bg-[#0077e6]"
-  >
-    <MessengerIcon />
-  </a>
+   {facebookMessenger && (
+<MessengerFloatingBox
+  messengerUsername={facebookMessenger}
+  companyName={companyName}
+/>
 )}
-
     </main>
   );
 }
 
-function MessengerIcon() {
-  return (
-    <svg
-      className="h-7 w-7 fill-current"
-      viewBox="0 0 240 240"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <path d="M120 0C53.7 0 0 49.8 0 111.2c0 35 17.5 66.3 44.8 86.7V240l40.9-22.4c10.9 3 22.4 4.7 34.3 4.7 66.3 0 120-49.8 120-111.2S186.3 0 120 0zm11.9 149.8l-30.5-32.5-59.5 32.5 65.4-69.4 31.3 32.5 58.7-32.5-65.4 69.4z" />
-    </svg>
-  );
-}
 
 function MapPinIcon() {
   return (
