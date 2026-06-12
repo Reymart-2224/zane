@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type MessengerFloatingBoxProps = {
   messengerUsername?: string;
@@ -11,9 +11,29 @@ export default function MessengerFloatingBox({
   messengerUsername,
   companyName = "us",
 }: MessengerFloatingBoxProps) {
-  const [minimized, setMinimized] = useState(false);
+  const [minimized, setMinimized] = useState(true);
+  const [ready, setReady] = useState(false);
 
-  if (!messengerUsername) return null;
+  useEffect(() => {
+    const checkScreen = () => {
+      const isDesktop = window.innerWidth >= 768;
+
+      // Desktop = open by default
+      // Mobile = minimized by default
+      setMinimized(!isDesktop);
+      setReady(true);
+    };
+
+    checkScreen();
+
+    window.addEventListener("resize", checkScreen);
+
+    return () => {
+      window.removeEventListener("resize", checkScreen);
+    };
+  }, []);
+
+  if (!messengerUsername || !ready) return null;
 
   const messengerUrl = `https://m.me/${messengerUsername}`;
 
