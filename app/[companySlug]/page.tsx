@@ -325,61 +325,85 @@ export default async function CompanyListingsPage({
     });
 
   return (
-    <main className="flex min-h-screen flex-col bg-[#f8fafc] text-[#111827] listings">
+    <main className="flex min-h-screen flex-col bg-gradient-to-b from-[#d8f3ff] via-[#edf9ff] to-white  text-[#111827] listings">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white">
+      <header className="border-b border-white/20 bg-gradient-to-br from-[#0f2d3a] via-[#296589] to-[#1d4f63] shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(0,0,0,0.35),0_12px_35px_rgba(0,0,0,0.18)]">
         <div className="mx-auto max-w-[1120px] px-4 py-6">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-[#111827] md:text-4xl">
+              <h1 className="text-3xl font-bold text-white md:text-4xl">
                 {companyName}
               </h1>
-
-              {companyAddress && (
-                <p className="mt-2 flex max-w-xl items-start gap-2 text-sm leading-relaxed text-gray-500">
-                  <MapPinIcon />
-                  <span>{companyAddress}</span>
-                </p>
-              )}
+ {companyAddress && ( <p className="mt-2 flex max-w-xl items-start gap-2 text-sm leading-relaxed text-white"> <MapPinIcon /> <span>{companyAddress}</span> </p> )}
+              
             </div>
+<div className="w-full md:w-auto md:min-w-[340px]">
+  <div className="flex flex-col gap-3 text-white">
+ 
 
-            <div className="w-full rounded-2xl border border-gray-200 bg-[#f8fafc] p-4 md:w-auto md:min-w-[340px]">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
-                Contact Details
-              </p>
+    {/* Phone */}
+    <div className="flex items-center gap-3">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/25 text-white">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106a1.125 1.125 0 00-1.173.417l-.97 1.293a1.125 1.125 0 01-1.21.38 12.035 12.035 0 01-7.143-7.143 1.125 1.125 0 01.38-1.21l1.293-.97a1.125 1.125 0 00.417-1.173L6.963 3.102A1.125 1.125 0 005.872 2.25H4.5A2.25 2.25 0 002.25 4.5v2.25z"
+          />
+        </svg>
+      </div>
 
-              <div className="space-y-3">
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                  <span className="text-sm text-gray-500">Phone</span>
+      {companyPhone ? (
+        <a
+          href={`tel:${companyPhone}`}
+          className="text-sm font-semibold text-white transition hover:underline"
+        >
+          {companyPhone}
+        </a>
+      ) : (
+        <span className="text-sm text-white/60">Not available</span>
+      )}
+    </div>
 
-                  {companyPhone ? (
-                    <a
-                      href={`tel:${companyPhone}`}
-                      className="text-sm font-semibold text-[#296589] hover:underline"
-                    >
-                      {companyPhone}
-                    </a>
-                  ) : (
-                    <span className="text-sm text-gray-400">Not available</span>
-                  )}
-                </div>
+    {/* Email */}
+    <div className="flex items-center gap-3">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/25 text-white">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M21.75 6.75v10.5A2.25 2.25 0 0119.5 19.5h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0l-7.5-4.615a2.25 2.25 0 01-1.07-1.916V6.75"
+          />
+        </svg>
+      </div>
 
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                  <span className="text-sm text-gray-500">Email</span>
-
-                  {companyEmail ? (
-                    <a
-                      href={`mailto:${companyEmail}`}
-                      className="break-all text-sm font-semibold text-[#296589] hover:underline"
-                    >
-                      {companyEmail}
-                    </a>
-                  ) : (
-                    <span className="text-sm text-gray-400">Not available</span>
-                  )}
-                </div>
-              </div>
-            </div>
+      {companyEmail ? (
+        <a
+          href={`mailto:${companyEmail}`}
+          className="break-all text-sm font-semibold text-white transition hover:underline"
+        >
+          {companyEmail}
+        </a>
+      ) : (
+        <span className="text-sm text-white/60">Not available</span>
+      )}
+    </div>
+  </div>
+</div>
           </div>
         </div>
       </header>
@@ -635,10 +659,11 @@ export default async function CompanyListingsPage({
             © {new Date().getFullYear()} {companyName}. All rights reserved.
           </p>
 
-          <p className="text-sm font-medium text-gray-500">
-            Powered by{" "}
-            <span className="font-bold text-[#296589]">Zane Listings</span>
-          </p>
+           <p className=" text-center text-xs text-gray-400">
+          Powered by{" "}
+          <span className="font-bold text-[#296589]">Zane IT Solutions</span> <br></br>
+          <small>Developed by Reymart Dungca</small>
+        </p>
         </div>
       </footer>
     </main>

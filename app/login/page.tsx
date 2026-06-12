@@ -1,8 +1,8 @@
 "use client";
-
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import zaneLogo from "@/assets/media/zane-logo-v3.png";
 export default function Login() {
   const router = useRouter();
 
@@ -60,10 +60,7 @@ export default function Login() {
   return (
     <main className="min-h-screen relative overflow-hidden bg-gradient-to-b from-sky-200 via-sky-100 to-white flex items-center justify-center px-4">
       <div className="absolute top-6 left-8 flex items-center gap-2 text-black font-semibold text-sm">
-        <div className="w-6 h-6 rounded-md bg-black text-white flex items-center justify-center text-xs">
-          Z
-        </div>
-        <span>Zane</span>
+      
       </div>
 
       <div className="absolute inset-0 pointer-events-none">
@@ -74,14 +71,16 @@ export default function Login() {
       </div>
 
       <section className="relative z-10 w-full max-w-[360px] rounded-[28px] bg-white/45 backdrop-blur-xl border border-white/70 shadow-[0_20px_60px_rgba(31,80,120,0.18)] px-7 py-8">
-        <div className="mx-auto mb-5 w-12 h-12 rounded-2xl bg-white/80 border border-white shadow-sm flex items-center justify-center">
-          <span className="text-xl">↪</span>
-        </div>
+        <Image
+              src={zaneLogo}
+              alt="Zane IT Solutions"
+              className="mx-auto mb-8 h-20 w-80 object-contain"
+            />
+
+
 
         <div className="text-center mb-6">
-          <h1 className="text-xl font-semibold text-gray-950">
-            Admin Login
-          </h1>
+        
           <p className="mt-2 text-xs leading-relaxed text-gray-500">
             Sign in using your admin username and password.
           </p>
@@ -117,11 +116,17 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-11 rounded-xl bg-gray-950 text-white text-sm font-medium shadow-lg hover:bg-black disabled:opacity-60 disabled:cursor-not-allowed transition"
+            className="mt-2 h-12 w-full rounded-xl bg-[#296589] text-sm font-bold text-white shadow-lg transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
+
+         <p className="mt-6 text-center text-xs text-gray-400">
+          Powered by{" "}
+          <span className="font-bold text-[#296589]">Zane IT Solutions</span> <br></br>
+          <small>Developed by Reymart Dungca</small>
+        </p>
       </section>
     </main>
   );

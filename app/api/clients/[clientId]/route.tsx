@@ -9,18 +9,40 @@ import {
   getDocs,
   serverTimestamp,
 } from "firebase/firestore";
-import bcrypt from "bcryptjs";
 import { db } from "@/lib/firebase";
 
 type RouteParams = {
   params: Promise<{
-    clientId: string;
+    id?: string;
+    clientId?: string;
   }>;
 };
 
+function normalize(value: string) {
+  return String(value || "").trim().toLowerCase();
+}
+
+async function getClientId(request: Request, params: RouteParams["params"]) {
+  const resolvedParams = await params;
+
+  const paramId = resolvedParams.id || resolvedParams.clientId;
+
+  if (paramId) {
+    return paramId;
+  }
+
+  // fallback from URL: /api/clients/CLIENT_ID
+  const url = new URL(request.url);
+  const parts = url.pathname.split("/").filter(Boolean);
+
+  return parts[parts.length - 1] || "";
+}
+
 export async function GET(request: Request, { params }: RouteParams) {
   try {
-    const { clientId } = await params;
+    const clientId = await getClientId(request, params);
+
+    console.log("GET CLIENT ID:", clientId);
 
     if (!clientId) {
       return NextResponse.json({ error: "Missing client ID" }, { status: 400 });
@@ -34,12 +56,12 @@ export async function GET(request: Request, { params }: RouteParams) {
     }
 
     const clientData = clientSnap.data();
+    const { password, ...safeClientData } = clientData;
 
     return NextResponse.json({
       client: {
         id: clientSnap.id,
-        ...clientData,
-        password: undefined,
+        ...safeClientData,
       },
     });
   } catch (error) {
@@ -56,7 +78,9 @@ export async function GET(request: Request, { params }: RouteParams) {
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
-    const { clientId } = await params;
+    const clientId = await getClientId(request, params);
+
+    console.log("PATCH CLIENT ID:", clientId);
 
     if (!clientId) {
       return NextResponse.json({ error: "Missing client ID" }, { status: 400 });
@@ -64,20 +88,28 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     const body = await request.json();
 
-    const {
-      company_name,
-      contact_name,
-      email,
-      phone,
-      address,
-      username,
-      password,
-      status,
-    } = body;
+    const company_name = String(body.company_name || "").trim();
+    const contact_name = String(body.contact_name || "").trim();
+    const email = String(body.email || "").trim();
+    const phone = String(body.phone || "").trim();
+    const address = String(body.address || "").trim();
+    const facebookMessenger = String(body.facebookMessenger || "").trim();
 
-    if (!company_name || !contact_name || !email || !username) {
+    // ✅ Added Facebook Page ID
+    const facebookPageId = String(body.facebookPageId || "").trim();
+
+    if (!company_name || !contact_name || !email) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Company name, contact name, and email are required." },
+        { status: 400 }
+      );
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: "Please enter a valid email address." },
         { status: 400 }
       );
     }
@@ -89,30 +121,36 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Client not found" }, { status: 404 });
     }
 
-    const cleanEmail = email.trim();
-    const cleanUsername = username.trim();
-
     const clientsRef = collection(db, "clients");
 
-    const usernameQuery = query(
+    const cleanEmailLower = normalize(email);
+    const cleanCompanyNameLower = normalize(company_name);
+
+    /**
+     * Duplicate email checker
+     */
+    const emailLowerQuery = query(
       clientsRef,
-      where("username", "==", cleanUsername)
+      where("emailLower", "==", cleanEmailLower)
     );
 
-    const usernameSnapshot = await getDocs(usernameQuery);
+    const emailLowerSnapshot = await getDocs(emailLowerQuery);
 
-    const usernameExists = usernameSnapshot.docs.some(
+    const emailLowerExists = emailLowerSnapshot.docs.some(
       (clientDoc) => clientDoc.id !== clientId
     );
 
-    if (usernameExists) {
+    if (emailLowerExists) {
       return NextResponse.json(
-        { error: "Username already exists" },
+        { error: "Email already exists. Please use another email." },
         { status: 409 }
       );
     }
 
-    const emailQuery = query(clientsRef, where("email", "==", cleanEmail));
+    /**
+     * Fallback checker for old records without emailLower
+     */
+    const emailQuery = query(clientsRef, where("email", "==", email));
     const emailSnapshot = await getDocs(emailQuery);
 
     const emailExists = emailSnapshot.docs.some(
@@ -121,30 +159,81 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     if (emailExists) {
       return NextResponse.json(
-        { error: "Email already exists" },
+        { error: "Email already exists. Please use another email." },
         { status: 409 }
       );
     }
 
-    const updateData: Record<string, unknown> = {
-      company_name: company_name.trim(),
-      contact_name: contact_name.trim(),
-      email: cleanEmail,
-      phone: phone?.trim() || "",
-      address: address?.trim() || "",
-      username: cleanUsername,
-      status: status === false ? false : true,
-      updatedAt: serverTimestamp(),
-    };
+    /**
+     * Duplicate company name checker
+     */
+    const companyLowerQuery = query(
+      clientsRef,
+      where("companyNameLower", "==", cleanCompanyNameLower)
+    );
 
-    if (password && password.trim() !== "") {
-      updateData.password = await bcrypt.hash(password, 10);
+    const companyLowerSnapshot = await getDocs(companyLowerQuery);
+
+    const companyLowerExists = companyLowerSnapshot.docs.some(
+      (clientDoc) => clientDoc.id !== clientId
+    );
+
+    if (companyLowerExists) {
+      return NextResponse.json(
+        { error: "Company name already exists. Please use another name." },
+        { status: 409 }
+      );
     }
 
-    await updateDoc(clientRef, updateData);
+    /**
+     * Fallback checker for old records without companyNameLower
+     */
+    const companyQuery = query(
+      clientsRef,
+      where("company_name", "==", company_name)
+    );
+
+    const companySnapshot = await getDocs(companyQuery);
+
+    const companyExists = companySnapshot.docs.some(
+      (clientDoc) => clientDoc.id !== clientId
+    );
+
+    if (companyExists) {
+      return NextResponse.json(
+        { error: "Company name already exists. Please use another name." },
+        { status: 409 }
+      );
+    }
+
+    await updateDoc(clientRef, {
+      company_name,
+      companyNameLower: cleanCompanyNameLower,
+
+      contact_name,
+
+      email,
+      emailLower: cleanEmailLower,
+
+      phone,
+      address,
+
+      facebookMessenger,
+      facebookPageId,
+
+      updatedAt: serverTimestamp(),
+    });
+
+    const updatedSnap = await getDoc(clientRef);
+    const updatedData = updatedSnap.data() || {};
+    const { password, ...safeUpdatedData } = updatedData;
 
     return NextResponse.json({
       message: "Client updated successfully",
+      client: {
+        id: updatedSnap.id,
+        ...safeUpdatedData,
+      },
     });
   } catch (error) {
     console.error("Update client error:", error);

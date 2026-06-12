@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import MessengerChatBox from "@/components/MessengerChatBox";
 import {
   collection,
   doc,
@@ -41,6 +42,8 @@ type Client = {
   email?: string;
   phone?: string;
   address?: string;
+  facebookMessenger?: string;
+    facebookPageId?: string;
 };
 
 function formatPeso(price?: string) {
@@ -230,6 +233,8 @@ export default async function PublicListingPage({ params }: PageProps) {
   const companyPhone = client?.phone || "";
   const companyEmail = client?.email || "";
   const companyAddress = client?.address || "";
+const facebookMessenger = client?.facebookMessenger || "";
+const facebookPageId = client?.facebookPageId || "";
 
   const galleryImages = [
     ...(listing.featuredImage ? [listing.featuredImage] : []),
@@ -239,24 +244,24 @@ export default async function PublicListingPage({ params }: PageProps) {
   return (
     <main className="flex min-h-screen flex-col bg-[#f8fafc] text-[#111827]">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+     <header className="border-b border-white/10 bg-gradient-to-r from-[#143747] to-[#296589]">
         <div className="mx-auto max-w-[1120px] px-4 py-6">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             {/* Left */}
             <div>
               <Link
                 href={`/${companySlug}`}
-                className="mb-3 inline-flex text-sm font-semibold text-[var(--zl-primary)] hover:underline"
+                className="mb-3 inline-flex text-sm font-semibold text-white hover:underline"
               >
                 ← Back to listings
               </Link>
 
-              <h1 className="text-3xl font-bold text-[#111827] md:text-4xl">
+              <h1 className="text-3xl font-bold text-white md:text-4xl">
                 {companyName}
               </h1>
 
               {companyAddress && (
-                <p className="mt-2 flex max-w-xl items-start gap-2 text-sm leading-relaxed text-gray-500">
+                <p className="mt-2 flex max-w-xl items-start gap-2 text-sm leading-relaxed text-white">
                   <MapPinIcon />
                   <span>{companyAddress}</span>
                 </p>
@@ -265,18 +270,18 @@ export default async function PublicListingPage({ params }: PageProps) {
 
             {/* Right */}
             <div className="w-full rounded-2xl border border-gray-200 bg-[#f8fafc] p-4 md:w-auto md:min-w-[340px]">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-black">
                 Contact Details
               </p>
 
               <div className="space-y-3">
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                  <span className="text-sm text-gray-500">Phone</span>
+                  <span className="text-sm text-black">Phone</span>
 
                   {companyPhone ? (
                     <a
                       href={`tel:${companyPhone}`}
-                      className="text-sm font-semibold text-[var(--zl-primary)] hover:underline"
+                      className="text-sm font-semibold text-[#296589] hover:underline"
                     >
                       {companyPhone}
                     </a>
@@ -286,12 +291,12 @@ export default async function PublicListingPage({ params }: PageProps) {
                 </div>
 
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                  <span className="text-sm text-gray-500">Email</span>
+                  <span className="text-sm text-black">Email</span>
 
                   {companyEmail ? (
                     <a
                       href={`mailto:${companyEmail}`}
-                      className="break-all text-sm font-semibold text-[var(--zl-primary)] hover:underline"
+                      className="break-all text-sm font-semibold text-[#296589] hover:underline"
                     >
                       {companyEmail}
                     </a>
@@ -400,15 +405,41 @@ export default async function PublicListingPage({ params }: PageProps) {
             © {new Date().getFullYear()} {companyName}. All rights reserved.
           </p>
 
-          <p className="text-sm font-medium text-gray-500">
-            Powered by{" "}
-            <span className="font-bold text-[var(--zl-primary)]">
-              Zane Listings
-            </span>
-          </p>
+           <p className=" text-xs text-gray-400">
+          Powered by{" "}
+          <span className="font-bold text-[#296589]">Zane IT Solutions</span> <br></br>
+          <small>Developed by Reymart Dungca</small>
+        </p>
         </div>
       </footer>
+<MessengerChatBox pageId={facebookPageId} />
+
+{!facebookPageId && facebookMessenger && (
+  <a
+    href={`https://m.me/${facebookMessenger}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Message on Facebook Messenger"
+    className="fixed bottom-5 right-5 z-[9999] flex h-14 w-14 items-center justify-center rounded-full bg-[#0084ff] text-white shadow-[0_12px_35px_rgba(0,132,255,0.35)] transition hover:scale-105 hover:bg-[#0077e6]"
+  >
+    <MessengerIcon />
+  </a>
+)}
+
     </main>
+  );
+}
+
+function MessengerIcon() {
+  return (
+    <svg
+      className="h-7 w-7 fill-current"
+      viewBox="0 0 240 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path d="M120 0C53.7 0 0 49.8 0 111.2c0 35 17.5 66.3 44.8 86.7V240l40.9-22.4c10.9 3 22.4 4.7 34.3 4.7 66.3 0 120-49.8 120-111.2S186.3 0 120 0zm11.9 149.8l-30.5-32.5-59.5 32.5 65.4-69.4 31.3 32.5 58.7-32.5-65.4 69.4z" />
+    </svg>
   );
 }
 

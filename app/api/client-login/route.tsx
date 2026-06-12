@@ -53,18 +53,20 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({
-      message: "Login successful",
-      client: {
-        id: clientDoc.id,
-        company_name: clientData.company_name || "",
-        contact_name: clientData.contact_name || "",
-        email: clientData.email || "",
-        phone: clientData.phone || "",
-        address: clientData.address || "",
-        username: clientData.username || "",
-        role: "client",
-      },
-    });
+  message: "Login successful",
+  client: {
+    id: clientDoc.id,
+    company_name: clientData.company_name || "",
+    companySlug: clientData.companySlug || "",
+    contact_name: clientData.contact_name || "",
+    email: clientData.email || "",
+    phone: clientData.phone || "",
+    address: clientData.address || "",
+    facebookMessenger: clientData.facebookMessenger || "",
+    username: clientData.username || "",
+    role: "client",
+  },
+});
   } catch (error) {
     console.error("Client login error:", error);
 

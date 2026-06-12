@@ -508,6 +508,22 @@ export default function PortalEditListingPage() {
           </form>
         )}
       </section>
+
+      {/* Footer */}
+      <footer className="mt-auto border-t border-gray-200 bg-white">
+        <div className="mx-auto flex max-w-[1120px] flex-col items-center justify-between gap-2 px-4 py-5 text-center sm:flex-row sm:text-left">
+          <p className="text-sm text-gray-500">
+          
+          </p>
+
+           <p className=" text-xs text-gray-400">
+          Powered by{" "}
+          <span className="font-bold text-[#296589]">Zane IT Solutions</span> <br></br>
+          <small>Developed by Reymart Dungca</small>
+        </p>
+        </div>
+      </footer>
+
     </main>
   );
 }

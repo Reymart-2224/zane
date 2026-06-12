@@ -2,13 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import zaneIcon from "@/assets/media/zane-icon.png";
-import zaneLogo from "@/assets/media/zane-logo-v2.png";
+import zaneLogo from "@/assets/media/zane-logo-v3.png";
 import zaneWindow from "@/assets/media/zane-flow.png";
 
 
 import zaneSW from "@/assets/media/sw.png";
 import zaneSystemDash from "@/assets/media/zane-system-dash.png";
-import zaneListing from "@/assets/media/zane-listing.png";
 export const metadata: Metadata = {
   title: "ZANE IT Solutions | Future-Ready IT & Digital Systems",
   description:
@@ -394,7 +393,7 @@ export default function HomePage() {
 
       <div className="space-y-4">
         <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#081827]">
-             <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#06121f]/15 backdrop-blur-[2px]">
+             <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#06121f]/15 backdrop-blur-[1px]">
           <span className="rounded-full border border-white/10 bg-[#06121f]/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-white/80">
             Data Blurred
           </span>
@@ -402,7 +401,7 @@ export default function HomePage() {
  <Image
             src={zaneSW}
             alt="Still Waters Academy System"
-            className="h-[300px] w-full object-cover blur-[3px]"
+            className="h-[300px] w-full object-cover blur-[1px]"
             placeholder="blur"
           />
           
@@ -454,7 +453,7 @@ export default function HomePage() {
       </p>
 
       <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#eef8fb]">
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#06121f]/15 backdrop-blur-[2px]">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#06121f]/15 backdrop-blur-[0.5px]">
           <span className="rounded-full border border-white/10 bg-[#06121f]/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-white/80">
             Data Blurred
           </span>
@@ -462,7 +461,7 @@ export default function HomePage() {
 <Image
             src={zaneSystemDash}
             alt="Still Waters Academy System Dashboard"
-            className="h-[300px] w-full object-cover blur-[3px]"
+            className="h-[300px] w-full object-cover "
             placeholder="blur"
           />
          

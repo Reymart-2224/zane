@@ -34,6 +34,8 @@ type Client = {
   username: string;
   role?: string;
   status?: boolean;
+  facebookMessenger?: string;
+    facebookPageId?: string;
 };
 
 type Listing = {
@@ -234,6 +236,114 @@ export default function ClientPortalDashboardPage() {
     setLeadsPage(1);
   }, [leadSearch, leadStatusFilter, leadListingFilter]);
 
+
+  useEffect(() => {
+  if (!client) return;
+
+  setProfileForm({
+    company_name: client.company_name || "",
+    contact_name: client.contact_name || "",
+    email: client.email || "",
+    phone: client.phone || "",
+    facebookMessenger: client.facebookMessenger || "",
+    facebookPageId: client.facebookPageId || "",
+    address: client.address || "",
+  });
+}, [client]);
+
+  const [showProfileForm, setShowProfileForm] = useState(false);
+const [savingProfile, setSavingProfile] = useState(false);
+
+const [profileForm, setProfileForm] = useState({
+  company_name: "",
+  contact_name: "",
+  email: "",
+  phone: "",
+  facebookMessenger: "",
+  facebookPageId: "",
+  address: "",
+});
+
+
+const handleProfileChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) => {
+  const { name, value } = e.target;
+
+  setProfileForm((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
+const updateProfile = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  setError("");
+  setSuccess("");
+  setSavingProfile(true);
+
+  try {
+    const storedClient = localStorage.getItem("clientPortalUser");
+    const parsedStoredClient = storedClient ? JSON.parse(storedClient) : null;
+
+    const clientId = client?.id || parsedStoredClient?.id;
+
+    console.log("LOCAL STORAGE CLIENT:", parsedStoredClient);
+    console.log("CLIENT ID USED:", clientId);
+    console.log("PATCH URL:", `/api/clients/${clientId}`);
+
+    if (!clientId) {
+      setError("Client ID is missing. Please logout and login again.");
+      return;
+    }
+
+    const res = await fetch(`/api/clients/${clientId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(profileForm),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.error || "Failed to update profile");
+      return;
+    }
+
+    setSuccess("Profile updated successfully.");
+
+    if (data.client) {
+      setClient(data.client);
+
+      localStorage.setItem(
+        "clientPortalUser",
+        JSON.stringify({
+          ...parsedStoredClient,
+          id: data.client.id || clientId,
+          company_name: data.client.company_name || "",
+          companySlug: data.client.companySlug || "",
+          contact_name: data.client.contact_name || "",
+          email: data.client.email || "",
+          phone: data.client.phone || "",
+          address: data.client.address || "",
+          facebookMessenger: data.client.facebookMessenger || "",
+          facebookPageId: data.client.facebookPageId || "",
+          username: data.client.username || "",
+          role: data.client.role || "client",
+        })
+      );
+    }
+
+    setShowProfileForm(false);
+  } catch (err) {
+    console.error(err);
+    setError("Failed to update profile.");
+  } finally {
+    setSavingProfile(false);
+  }
+};
   const handleListingChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -988,46 +1098,167 @@ export default function ClientPortalDashboardPage() {
               )}
 
               {activeTab === "account" && (
-                <div className="space-y-5">
-                  <div>
-                    <h2 className="text-xl font-bold text-[#1d2b35]">
-                      Account Information
-                    </h2>
-                    <p className="mt-1 text-sm text-gray-400">
-                      View your company and contact information.
-                    </p>
-                  </div>
+  <div className="space-y-5">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 className="text-xl font-bold text-[#1d2b35]">
+          Account Information
+        </h2>
+        <p className="mt-1 text-sm text-gray-400">
+          View and update your company and contact information.
+        </p>
+      </div>
 
-                  <div className="rounded-[22px] border border-blue-100 bg-[#f6fbff] p-4 sm:rounded-[24px] sm:p-6">
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <InfoCard
-                        label="Company Name"
-                        value={client.company_name}
-                      />
-                      <InfoCard
-                        label="Contact Name"
-                        value={client.contact_name}
-                      />
-                      <InfoCard label="Email" value={client.email} />
-                      <InfoCard label="Phone" value={client.phone || "-"} />
-                      <InfoCard label="Username" value={client.username} />
-                      <InfoCard
-                        label="Status"
-                        value={client.status ? "Active" : "Inactive"}
-                      />
+      <button
+        type="button"
+        onClick={() => {
+          setShowProfileForm(!showProfileForm);
+          setError("");
+          setSuccess("");
+        }}
+        className="w-full rounded-full bg-[#296589] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 sm:w-auto"
+      >
+        {showProfileForm ? "Close Form" : "Update Profile"}
+      </button>
+    </div>
 
-                      <div className="rounded-2xl bg-white p-4 md:col-span-2">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                          Address
-                        </p>
-                        <p className="mt-1 break-words text-sm font-semibold text-[#1d2b35]">
-                          {client.address || "-"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+    {showProfileForm && (
+      <form
+        onSubmit={updateProfile}
+        className="rounded-[22px] border border-blue-100 bg-[#f6fbff] p-4 sm:rounded-[24px] sm:p-6"
+      >
+        <h3 className="mb-5 text-lg font-bold text-[#1d2b35]">
+          Update Profile
+        </h3>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <ProfileInputField
+            label="Company Name"
+            name="company_name"
+            value={profileForm.company_name}
+            onChange={handleProfileChange}
+            required
+          />
+
+          <ProfileInputField
+            label="Contact Name"
+            name="contact_name"
+            value={profileForm.contact_name}
+            onChange={handleProfileChange}
+            required
+          />
+
+          <ProfileInputField
+            label="Email"
+            name="email"
+            type="email"
+            value={profileForm.email}
+            onChange={handleProfileChange}
+            required
+          />
+
+          <ProfileInputField
+            label="Phone"
+            name="phone"
+            value={profileForm.phone}
+            onChange={handleProfileChange}
+          />
+
+          <ProfileInputField
+            label="Facebook Messenger Username"
+            name="facebookMessenger"
+            value={profileForm.facebookMessenger}
+            onChange={handleProfileChange}
+            placeholder="Example: yourPageUsername"
+          />
+
+             <ProfileInputField
+            label="Facebook Page ID"
+            name="facebookPageId"
+            value={profileForm.facebookPageId}
+            onChange={handleProfileChange}
+            placeholder="Example: yourPageID"
+          />
+
+          <div className="space-y-1 md:col-span-2">
+            <label className="text-xs font-semibold text-gray-500">
+              Address
+            </label>
+
+            <textarea
+              name="address"
+              value={profileForm.address}
+              onChange={handleProfileChange}
+              rows={4}
+              className="w-full resize-none rounded-xl border border-blue-100 bg-white px-4 py-3 text-sm text-[#1d2b35] outline-none focus:ring-2 focus:ring-blue-200"
+            />
+          </div>
+        </div>
+
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              setShowProfileForm(false);
+              setProfileForm({
+                company_name: client.company_name || "",
+                contact_name: client.contact_name || "",
+                email: client.email || "",
+                phone: client.phone || "",
+                facebookMessenger: client.facebookMessenger || "",
+                facebookPageId: client.facebookPageId || "",
+                address: client.address || "",
+              });
+            }}
+            className="w-full rounded-full border border-blue-100 bg-white px-5 py-3 text-sm font-semibold text-gray-500 transition hover:bg-blue-50 sm:w-auto"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            disabled={savingProfile}
+            className="w-full rounded-full bg-[#296589] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          >
+            {savingProfile ? "Saving..." : "Save Profile"}
+          </button>
+        </div>
+      </form>
+    )}
+
+    <div className="rounded-[22px] border border-blue-100 bg-[#f6fbff] p-4 sm:rounded-[24px] sm:p-6">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <InfoCard label="Company Name" value={client.company_name} />
+        <InfoCard label="Contact Name" value={client.contact_name} />
+        <InfoCard label="Email" value={client.email} />
+        <InfoCard label="Phone" value={client.phone || "-"} />
+
+        <MessengerInfoCard
+          label="Facebook Messenger"
+          username={client.facebookMessenger}
+        />
+
+        <InfoCard label="Facebook Page ID" value={client.facebookPageId || "-"} />
+
+        <InfoCard label="Username" value={client.username} />
+
+        <InfoCard
+          label="Status"
+          value={client.status ? "Active" : "Inactive"}
+        />
+
+        <div className="rounded-2xl bg-white p-4 md:col-span-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+            Address
+          </p>
+          <p className="mt-1 break-words text-sm font-semibold text-[#1d2b35]">
+            {client.address || "-"}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
             </div>
           </div>
         </div>
@@ -1040,15 +1271,77 @@ export default function ClientPortalDashboardPage() {
             reserved.
           </p>
 
-          <p className="text-sm font-medium text-gray-500">
-            Powered by{" "}
-            <span className="font-bold text-[var(--zl-primary)]">
-              Zane Listings
-            </span>
-          </p>
+           <p className=" text-xs text-gray-400">
+          Powered by{" "}
+          <span className="font-bold text-[#296589]">Zane IT Solutions</span> <br></br>
+          <small>Developed by Reymart Dungca</small>
+        </p>
         </div>
       </footer>
     </main>
+  );
+}
+
+
+function ProfileInputField({
+  label,
+  name,
+  value,
+  onChange,
+  type = "text",
+  required = false,
+  placeholder = "",
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  type?: string;
+  required?: boolean;
+  placeholder?: string;
+}) {
+  return (
+    <div className="space-y-1">
+      <label className="text-xs font-semibold text-gray-500">{label}</label>
+
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        required={required}
+        placeholder={placeholder}
+        className="h-11 w-full rounded-xl border border-blue-100 bg-white px-4 text-sm text-[#1d2b35] outline-none focus:ring-2 focus:ring-blue-200"
+      />
+    </div>
+  );
+}
+function MessengerInfoCard({
+  label,
+  username,
+}: {
+  label: string;
+  username?: string;
+}) {
+  return (
+    <div className="rounded-2xl bg-white p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+        {label}
+      </p>
+
+      {username ? (
+        <a
+          href={`https://m.me/${username}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-1 block break-words text-sm font-semibold text-[#296589] hover:underline"
+        >
+          m.me/{username}
+        </a>
+      ) : (
+        <p className="mt-1 text-sm font-semibold text-[#1d2b35]">-</p>
+      )}
+    </div>
   );
 }
 

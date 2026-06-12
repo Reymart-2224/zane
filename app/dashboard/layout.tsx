@@ -1,9 +1,9 @@
 "use client";
-
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
+import zaneIcon from "@/assets/media/zane-icon.png";
 type LoggedInUser = {
   id: string;
   username: string;
@@ -115,11 +115,12 @@ export default function AdminLayout({
         >
           <div className="mb-6 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-bold">
-                Z
-              </div>
+               <Image
+              src={zaneIcon}
+              alt="Zane Icon"
+              className="mx-auto mb-8 h-20 w-20 object-contain"
+            />
               <div>
-                <h1 className="font-bold leading-none">Zane</h1>
                 <p className="text-xs text-white/70 mt-1">Admin Panel</p>
               </div>
             </div>
@@ -202,7 +203,7 @@ export default function AdminLayout({
 
 <footer className="mt-6 rounded-2xl border border-[#ecf6f4] bg-white/70 px-4 py-4 text-center text-xs text-gray-500 shadow-sm sm:flex sm:items-center sm:justify-between sm:text-left">
   <p>
-    © {new Date().getFullYear()} Zane. All rights reserved.
+    © {new Date().getFullYear()} Zane IT Solutions. All rights reserved.
   </p>
 
   <p className="mt-1 sm:mt-0">
@@ -230,12 +231,16 @@ function SidebarContent({
   return (
     <>
       <div className="hidden lg:flex items-center gap-3 mb-12">
-        <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-bold">
-          Z
+        <div className="w-9 h-9 rounded-xl  flex items-center justify-center font-bold">
+            <Image
+              src={zaneIcon}
+              alt="Zane Icon"
+              className="mx-auto  h-20 w-20 object-contain"
+            />
         </div>
         <div>
-          <h1 className="font-bold leading-none">Zane</h1>
-          <p className="text-xs text-white/70 mt-1">Admin Panel</p>
+         
+          <p className="text-xs text-white mt-1 font-bold">Admin Panel</p>
         </div>
       </div>
 
