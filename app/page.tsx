@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import zaneIcon from "@/assets/media/zane-icon.png";
 import zaneLogo from "@/assets/media/zane-logo-v3.png";
 import zaneWindow from "@/assets/media/zane-flow.png";
-
+import ContactSubmitButton from "@/components/ContactSubmitButton";
 
 import zaneSW from "@/assets/media/sw.png";
 import zaneSystemDash from "@/assets/media/zane-system-dash.png";
@@ -587,7 +587,7 @@ export default function HomePage() {
 <section id="contact" className="mx-auto max-w-7xl px-5 py-24 md:px-8">
   <div className="grid gap-8 rounded-[40px] border border-white/10 bg-gradient-to-br from-[#296589]/35 via-[#06121f] to-[#2f8c74]/25 p-6 shadow-2xl backdrop-blur-md md:p-10 lg:grid-cols-[0.9fr_1.1fr]">
     {/* Left Content */}
-    <div className="flex flex-col justify-between rounded-[32px] border border-white/10 bg-white/[0.04] p-7 md:p-9">
+    <div className="flex flex-col justify-between p-7 md:p-9">
       <div>
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#2f8c74]/30 bg-[#2f8c74]/10 px-4 py-2 text-sm text-[#8ff0d1]">
           <span className="h-2 w-2 rounded-full bg-[#2f8c74] shadow-[0_0_16px_#2f8c74]" />
@@ -721,12 +721,7 @@ export default function HomePage() {
           />
         </div>
 
-        <button
-          type="submit"
-          className="w-full rounded-full bg-[#2f8c74] px-8 py-4 text-sm font-bold text-white transition hover:bg-[#267762]"
-        >
-          Send Message
-        </button>
+      <ContactSubmitButton />
 
         <p className="text-center text-xs leading-6 text-white/40">
           You can also contact us directly through WhatsApp, phone, or email.

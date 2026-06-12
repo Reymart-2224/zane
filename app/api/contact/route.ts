@@ -53,14 +53,17 @@ export async function POST(request: Request) {
 
     if (!name || !email || !service || !message) {
       return NextResponse.redirect(
-        new URL("/?message=missing-fields#contact", request.url)
+        new URL("/?message=missing-fields#contact", request.url),
+        303
       );
     }
 
     if (!process.env.RESEND_API_KEY || !process.env.CONTACT_EMAIL_TO) {
       console.error("Missing Resend config.");
+
       return NextResponse.redirect(
-        new URL("/?message=config-error#contact", request.url)
+        new URL("/?message=config-error#contact", request.url),
+        303
       );
     }
 
@@ -103,19 +106,21 @@ export async function POST(request: Request) {
         `<b>Phone:</b> ${safePhone}`,
         `<b>Service:</b> ${safeService}`,
         "",
-        `<b>Message:</b>`,
+        "<b>Message:</b>",
         escapeHtml(message),
       ].join("\n")
     );
 
     return NextResponse.redirect(
-      new URL("/?message=success#contact", request.url)
+      new URL("/?message=success#contact", request.url),
+      303
     );
   } catch (error) {
     console.error("Contact form error:", error);
 
     return NextResponse.redirect(
-      new URL("/?message=error#contact", request.url)
+      new URL("/?message=error#contact", request.url),
+      303
     );
   }
 }
