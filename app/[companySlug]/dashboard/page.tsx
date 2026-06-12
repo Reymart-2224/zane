@@ -1220,7 +1220,7 @@ const updateProfile = async (e: React.FormEvent) => {
             disabled={savingProfile}
             className="w-full rounded-full bg-[#296589] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
-            {savingProfile ? "Saving..." : "Save Profiles"}
+            {savingProfile ? "Saving..." : "Save Profile"}
           </button>
         </div>
       </form>
