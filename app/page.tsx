@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import zaneIcon from "@/assets/media/zane-icon.png";
 import zaneLogo from "@/assets/media/zane-logo-v3.png";
 import zaneWindow from "@/assets/media/zane-flow.png";
-import ContactSubmitButton from "@/components/ContactSubmitButton";
+import ContactForm from "@/components/ContactForm";
 
 import zaneSW from "@/assets/media/sw.png";
 import zaneSystemDash from "@/assets/media/zane-system-dash.png";
@@ -67,15 +67,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams?: Promise<{
-    message?: string;
-  }>;
-}) {
-  const resolvedSearchParams = await searchParams;
-  const formMessage = resolvedSearchParams?.message;
+export default async function HomePage() {
 
   return (
   <main className="min-h-screen overflow-x-hidden bg-[#06121f] text-white">
@@ -649,122 +641,7 @@ export default async function HomePage({
 
     {/* Form */}
     <div className="rounded-[32px] border border-white/10 bg-[#081827]/80 p-6 backdrop-blur-xl md:p-8">
-    {formMessage === "success" && (
-  <div className="mb-5 rounded-2xl border border-[#2f8c74]/40 bg-[#2f8c74]/15 px-5 py-4 text-sm font-semibold text-[#8ff0d1]">
-    Message sent successfully. I’ll get back to you soon.
-  </div>
-)}
-
-{formMessage === "error" && (
-  <div className="mb-5 rounded-2xl border border-red-400/40 bg-red-500/15 px-5 py-4 text-sm font-semibold text-red-200">
-    Something went wrong. Please try again or message me directly.
-  </div>
-)}
-
-{formMessage === "missing-fields" && (
-  <div className="mb-5 rounded-2xl border border-yellow-400/40 bg-yellow-500/15 px-5 py-4 text-sm font-semibold text-yellow-100">
-    Please complete all required fields.
-  </div>
-)}
-
-{formMessage === "config-error" && (
-  <div className="mb-5 rounded-2xl border border-red-400/40 bg-red-500/15 px-5 py-4 text-sm font-semibold text-red-200">
-    Email configuration error. Please check Vercel environment variables.
-  </div>
-)}
-
-      <form action="/api/contact" method="POST" className="space-y-5">
-        <div className="grid gap-5 md:grid-cols-2">
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-white/70">
-              Full Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              required
-              placeholder="Your name"
-              className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2f8c74] focus:ring-2 focus:ring-[#2f8c74]/20"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-white/70">
-              Email Address
-            </label>
-            <input
-              type="email"
-              name="email"
-              required
-              placeholder="you@example.com"
-              className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2f8c74] focus:ring-2 focus:ring-[#2f8c74]/20"
-            />
-          </div>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-2">
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-white/70">
-              Phone Number
-            </label>
-            <input
-              type="text"
-              name="phone"
-              placeholder="Your phone number"
-              className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2f8c74] focus:ring-2 focus:ring-[#2f8c74]/20"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-white/70">
-              Service Needed
-            </label>
-            <select
-              name="service"
-              required
-              className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-sm text-white outline-none focus:border-[#2f8c74] focus:ring-2 focus:ring-[#2f8c74]/20"
-            >
-              <option value="" className="text-black">
-                Select service
-              </option>
-              <option value="Web Development" className="text-black">
-                Web Development
-              </option>
-              <option value="IT Automation" className="text-black">
-                IT Automation
-              </option>
-              <option value="Dashboard/System" className="text-black">
-                Dashboard/System
-              </option>
-              <option value="Cloud Solutions" className="text-black">
-                Cloud Solutions
-              </option>
-              <option value="Support & Maintenance" className="text-black">
-                Support & Maintenance
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-semibold text-white/70">
-            Project Details
-          </label>
-          <textarea
-            name="message"
-            required
-            rows={6}
-            placeholder="Tell us about your project..."
-            className="w-full resize-none rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2f8c74] focus:ring-2 focus:ring-[#2f8c74]/20"
-          />
-        </div>
-
-      <ContactSubmitButton />
-
-        <p className="text-center text-xs leading-6 text-white/40">
-          You can also contact us directly through WhatsApp, phone, or email.
-        </p>
-      </form>
+    <ContactForm />
     </div>
   </div>
 </section>

@@ -23,18 +23,24 @@ export async function POST(request: Request) {
     const message = String(formData.get("message") || "").trim();
 
     if (!name || !email || !service || !message) {
-      return NextResponse.redirect(
-        new URL("/?message=missing-fields#contact", request.url),
-        303
+      return NextResponse.json(
+        {
+          success: false,
+          message: "missing-fields",
+        },
+        { status: 400 }
       );
     }
 
     if (!process.env.RESEND_API_KEY || !process.env.CONTACT_EMAIL_TO) {
       console.error("Missing Resend environment variables.");
 
-      return NextResponse.redirect(
-        new URL("/?message=config-error#contact", request.url),
-        303
+      return NextResponse.json(
+        {
+          success: false,
+          message: "config-error",
+        },
+        { status: 500 }
       );
     }
 
@@ -44,7 +50,7 @@ export async function POST(request: Request) {
     const safeService = escapeHtml(service);
     const safeMessage = escapeHtml(message).replaceAll("\n", "<br />");
 
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from:
         process.env.CONTACT_EMAIL_FROM ||
         "ZANE IT Solutions <onboarding@resend.dev>",
@@ -68,16 +74,30 @@ export async function POST(request: Request) {
       `,
     });
 
-    return NextResponse.redirect(
-      new URL("/?message=success#contact", request.url),
-      303
-    );
+    if (error) {
+      console.error("Resend error:", error);
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: "error",
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+    });
   } catch (error) {
     console.error("Contact form error:", error);
 
-    return NextResponse.redirect(
-      new URL("/?message=error#contact", request.url),
-      303
+    return NextResponse.json(
+      {
+        success: false,
+        message: "error",
+      },
+      { status: 500 }
     );
   }
 }
