@@ -16,14 +16,9 @@ async function sendTelegramMessage(text: string) {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
-  if (!botToken || !chatId) {
-    console.warn("Telegram config missing.");
-    return;
-  }
+  if (!botToken || !chatId) return;
 
-  const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
-
-  const response = await fetch(telegramUrl, {
+  await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -34,11 +29,6 @@ async function sendTelegramMessage(text: string) {
       parse_mode: "HTML",
     }),
   });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Telegram notification failed:", errorText);
-  }
 }
 
 export async function POST(request: Request) {
@@ -58,26 +48,17 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!process.env.RESEND_API_KEY || !process.env.CONTACT_EMAIL_TO) {
-      console.error("Missing Resend config.");
-
-      return NextResponse.redirect(
-        new URL("/?message=config-error#contact", request.url),
-        303
-      );
-    }
-
     const safeName = escapeHtml(name);
     const safeEmail = escapeHtml(email);
     const safePhone = escapeHtml(phone || "Not provided");
     const safeService = escapeHtml(service);
-    const safeMessage = escapeHtml(message).replaceAll("\n", "<br />");
+    const safeMessage = escapeHtml(message);
 
     await resend.emails.send({
       from:
         process.env.CONTACT_EMAIL_FROM ||
         "ZANE IT Solutions <onboarding@resend.dev>",
-      to: process.env.CONTACT_EMAIL_TO,
+      to: [process.env.CONTACT_EMAIL_TO || "reymartdungca.dev@gmail.com"],
       replyTo: email,
       subject: `New ZANE inquiry from ${name}`,
       html: `
@@ -92,7 +73,7 @@ export async function POST(request: Request) {
           <hr />
 
           <p><strong>Project Details:</strong></p>
-          <p>${safeMessage}</p>
+          <p>${safeMessage.replaceAll("\n", "<br />")}</p>
         </div>
       `,
     });
@@ -107,7 +88,7 @@ export async function POST(request: Request) {
         `<b>Service:</b> ${safeService}`,
         "",
         "<b>Message:</b>",
-        escapeHtml(message),
+        safeMessage,
       ].join("\n")
     );
 

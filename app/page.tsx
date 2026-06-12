@@ -67,7 +67,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
+export default function HomePage({
+  searchParams,
+}: {
+  searchParams?: {
+    message?: string;
+  };
+}) {
+  const formMessage = searchParams?.message;
   return (
   <main className="min-h-screen overflow-x-hidden bg-[#06121f] text-white">
       {/* Background effects */}
@@ -635,6 +642,30 @@ export default function HomePage() {
 
     {/* Form */}
     <div className="rounded-[32px] border border-white/10 bg-[#081827]/80 p-6 backdrop-blur-xl md:p-8">
+    {formMessage === "success" && (
+  <div className="mb-5 rounded-2xl border border-[#2f8c74]/40 bg-[#2f8c74]/15 px-5 py-4 text-sm font-semibold text-[#8ff0d1]">
+    Message sent successfully. I’ll get back to you soon.
+  </div>
+)}
+
+{formMessage === "error" && (
+  <div className="mb-5 rounded-2xl border border-red-400/40 bg-red-500/15 px-5 py-4 text-sm font-semibold text-red-200">
+    Something went wrong. Please try again or message me directly.
+  </div>
+)}
+
+{formMessage === "missing-fields" && (
+  <div className="mb-5 rounded-2xl border border-yellow-400/40 bg-yellow-500/15 px-5 py-4 text-sm font-semibold text-yellow-100">
+    Please complete all required fields.
+  </div>
+)}
+
+{formMessage === "config-error" && (
+  <div className="mb-5 rounded-2xl border border-red-400/40 bg-red-500/15 px-5 py-4 text-sm font-semibold text-red-200">
+    Email configuration error. Please check Vercel environment variables.
+  </div>
+)}
+
       <form action="/api/contact" method="POST" className="space-y-5">
         <div className="grid gap-5 md:grid-cols-2">
           <div>
