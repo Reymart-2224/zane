@@ -1,4 +1,5 @@
 import Link from "next/link";
+import MessengerChatBox from "@/components/MessengerChatBox";
 import type { Metadata } from "next";
 import {
   collection,
@@ -54,6 +55,8 @@ type Client = {
   email?: string;
   phone?: string;
   address?: string;
+  facebookMessenger?: string;
+  facebookPageId?: string;
 };
 
 function formatSlug(slug: string) {
@@ -251,9 +254,11 @@ export default async function CompanyListingsPage({
   const companyName =
     client?.company_name || listings[0]?.companyName || formatSlug(companySlug);
 
-  const companyPhone = client?.phone || "";
-  const companyEmail = client?.email || "";
-  const companyAddress = client?.address || "";
+const companyPhone = client?.phone || "";
+const companyEmail = client?.email || "";
+const companyAddress = client?.address || "";
+const facebookMessenger = client?.facebookMessenger || "";
+const facebookPageId = client?.facebookPageId || "";
 
   const categories = Array.from(
     new Set(
@@ -666,7 +671,33 @@ export default async function CompanyListingsPage({
         </p>
         </div>
       </footer>
+            <MessengerChatBox pageId={facebookPageId} />
+
+      {facebookMessenger && (
+        <a
+          href={`https://m.me/${facebookMessenger}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Message on Facebook Messenger"
+          className="fixed bottom-5 right-5 z-[9999] flex h-14 w-14 items-center justify-center rounded-full bg-[#0084ff] text-white shadow-[0_12px_35px_rgba(0,132,255,0.35)] transition hover:scale-105 hover:bg-[#0077e6]"
+        >
+          <MessengerIcon />
+        </a>
+      )}
     </main>
+  );
+}
+
+function MessengerIcon() {
+  return (
+    <svg
+      className="h-7 w-7 fill-current"
+      viewBox="0 0 240 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path d="M120 0C53.7 0 0 49.8 0 111.2c0 35 17.5 66.3 44.8 86.7V240l40.9-22.4c10.9 3 22.4 4.7 34.3 4.7 66.3 0 120-49.8 120-111.2S186.3 0 120 0zm11.9 149.8l-30.5-32.5-59.5 32.5 65.4-69.4 31.3 32.5 58.7-32.5-65.4 69.4z" />
+    </svg>
   );
 }
 
