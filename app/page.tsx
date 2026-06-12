@@ -4,6 +4,11 @@ import type { Metadata } from "next";
 import zaneIcon from "@/assets/media/zane-icon.png";
 import zaneLogo from "@/assets/media/zane-logo-v2.png";
 import zaneWindow from "@/assets/media/zane-flow.png";
+
+
+import zaneSW from "@/assets/media/sw.png";
+import zaneSystemDash from "@/assets/media/zane-system-dash.png";
+import zaneListing from "@/assets/media/zane-listing.png";
 export const metadata: Metadata = {
   title: "ZANE IT Solutions | Future-Ready IT & Digital Systems",
   description:
@@ -91,6 +96,9 @@ export default function HomePage() {
       <Link href="#services" className="transition hover:text-white">
         Services
       </Link>
+      <Link href="#projects" className="transition hover:text-white">
+              Projects
+            </Link>
       <Link href="#solutions" className="transition hover:text-white">
         Solutions
       </Link>
@@ -350,6 +358,147 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Sample Projects */}
+<section id="projects" className="mx-auto max-w-7xl px-5 py-20 md:px-8">
+  <div className="mb-12 max-w-3xl">
+    <p className="mb-3 text-sm font-semibold uppercase tracking-[0.35em] text-[#2f8c74]">
+      Sample Projects
+    </p>
+
+    <h2 className="text-3xl font-bold tracking-tight md:text-5xl">
+      Real systems built for business operations.
+    </h2>
+
+    <p className="mt-5 leading-8 text-white/60">
+      Here are sample project types ZANE IT Solutions can build, from internal
+      admin systems to listing platforms. Sensitive information is intentionally
+      blurred in the previews.
+    </p>
+  </div>
+
+  <div className="grid gap-6 lg:grid-cols-2">
+    {/* Project 1 */}
+    <div className="group overflow-hidden rounded-[34px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-md transition hover:-translate-y-1 hover:border-[#2f8c74]/50 hover:bg-[#2f8c74]/10">
+      <div className="mb-6 flex items-center justify-between gap-5">
+        <div>
+          <span className="inline-flex rounded-full border border-[#2f8c74]/30 bg-[#2f8c74]/10 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-[#8ff0d1]">
+            Academy System
+          </span>
+
+          <h3 className="mt-5 text-2xl font-bold">
+            Still Waters Academy System
+          </h3>
+        </div>
+
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#296589] to-[#2f8c74] text-lg font-black shadow-[0_0_28px_rgba(47,140,116,0.35)]">
+          01
+        </div>
+      </div>
+
+      <p className="mb-6 leading-7 text-white/60">
+        A custom academy management system with dashboards for tracking
+        students, parents, therapists, sessions, invoices, expenses, paystubs,
+        reports, and analytics. It helps organize school operations in one
+        secure admin panel.
+      </p>
+
+      <div className="space-y-4">
+        <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#081827]">
+             <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#06121f]/15 backdrop-blur-[2px]">
+          <span className="rounded-full border border-white/10 bg-[#06121f]/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-white/80">
+            Data Blurred
+          </span>
+        </div>
+ <Image
+            src={zaneSW}
+            alt="Still Waters Academy System"
+            className="h-[300px] w-full object-cover blur-[3px]"
+            placeholder="blur"
+          />
+          
+        </div>
+
+      
+      </div>
+
+      <div className="mt-6 flex flex-wrap gap-2">
+        {[
+          "Admin Dashboard",
+          "Session Tracking",
+          "Invoices",
+          "Reports",
+          "Analytics",
+        ].map((tag) => (
+          <span
+            key={tag}
+            className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs text-white/60"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    </div>
+
+    {/* Project 2 */}
+    <div className="group overflow-hidden rounded-[34px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-md transition hover:-translate-y-1 hover:border-[#2f8c74]/50 hover:bg-[#2f8c74]/10">
+      <div className="mb-6 flex items-center justify-between gap-5">
+        <div>
+          <span className="inline-flex rounded-full border border-[#296589]/40 bg-[#296589]/15 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-[#9fdcff]">
+            Listing Platform
+          </span>
+
+          <h3 className="mt-5 text-2xl font-bold">
+            Real Estate Listing System
+          </h3>
+        </div>
+
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#296589] to-[#2f8c74] text-lg font-black shadow-[0_0_28px_rgba(47,140,116,0.35)]">
+          02
+        </div>
+      </div>
+
+      <p className="mb-6 leading-7 text-white/60">
+        A listing management system for companies, properties, sales, and leads.
+        It includes company profiles, listing pages, filters, lead tracking,
+        sales analytics, and an admin dashboard for monitoring performance.
+      </p>
+
+      <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#eef8fb]">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#06121f]/15 backdrop-blur-[2px]">
+          <span className="rounded-full border border-white/10 bg-[#06121f]/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-white/80">
+            Data Blurred
+          </span>
+        </div>
+<Image
+            src={zaneSystemDash}
+            alt="Still Waters Academy System Dashboard"
+            className="h-[300px] w-full object-cover blur-[3px]"
+            placeholder="blur"
+          />
+         
+      </div>
+
+      <div className="mt-6 flex flex-wrap gap-2">
+        {[
+          "Listings",
+          "Lead Tracking",
+          "Company Profiles",
+          "Sales Analytics",
+          "Filters",
+        ].map((tag) => (
+          <span
+            key={tag}
+            className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs text-white/60"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+
       {/* Solutions */}
       <section id="solutions" className="mx-auto max-w-7xl px-5 py-20 md:px-8">
         <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
@@ -495,7 +644,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      {/* Footer */}
+     
 <footer className="border-t border-white/10 px-5 py-8 md:px-8">
   <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-5 text-sm text-white/45 lg:flex-row">
     <div className="flex items-center gap-3">
