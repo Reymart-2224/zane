@@ -583,54 +583,158 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section id="contact" className="mx-auto max-w-7xl px-5 py-24 md:px-8">
-        <div className="relative overflow-hidden rounded-[40px] border border-white/10 bg-gradient-to-br from-[#296589]/40 via-[#06121f] to-[#2f8c74]/30 p-8 text-center shadow-2xl backdrop-blur-md md:p-16">
-          <div className="absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 rounded-full bg-[#2f8c74]/30 blur-[80px]" />
+      {/* Contact Form */}
+<section id="contact" className="mx-auto max-w-7xl px-5 py-24 md:px-8">
+  <div className="grid gap-8 rounded-[40px] border border-white/10 bg-gradient-to-br from-[#296589]/35 via-[#06121f] to-[#2f8c74]/25 p-6 shadow-2xl backdrop-blur-md md:p-10 lg:grid-cols-[0.9fr_1.1fr]">
+    {/* Left Content */}
+    <div className="flex flex-col justify-between rounded-[32px] border border-white/10 bg-white/[0.04] p-7 md:p-9">
+      <div>
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#2f8c74]/30 bg-[#2f8c74]/10 px-4 py-2 text-sm text-[#8ff0d1]">
+          <span className="h-2 w-2 rounded-full bg-[#2f8c74] shadow-[0_0_16px_#2f8c74]" />
+          Let’s work together
+        </div>
 
-          <div className="relative mx-auto max-w-3xl">
-            <Image
-              src={zaneIcon}
-              alt="Zane Icon"
-              className="mx-auto mb-8 h-20 w-20 object-contain"
+        <h2 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
+          Ready to build your next digital system?
+        </h2>
+
+        <p className="mt-5 max-w-xl leading-8 text-white/65">
+          Tell us about your website, automation, dashboard, or custom system.
+          We’ll get back to you as soon as possible.
+        </p>
+      </div>
+
+      <div className="mt-10 space-y-4 text-sm text-white/65">
+        <Link
+          href="tel:09365160775"
+          className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4 transition hover:bg-white/10 hover:text-white"
+        >
+          <span>Phone</span>
+          <strong className="text-white">0936 516 0775</strong>
+        </Link>
+
+        <Link
+          href="mailto:reymartdungca.dev@gmail.com"
+          className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4 transition hover:bg-white/10 hover:text-white"
+        >
+          <span>Email</span>
+          <strong className="text-white">Send Message</strong>
+        </Link>
+
+        <Link
+          href="https://wa.me/639365160775"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-between rounded-2xl border border-[#2f8c74]/30 bg-[#2f8c74]/10 px-5 py-4 text-[#8ff0d1] transition hover:bg-[#2f8c74]/20"
+        >
+          <span>WhatsApp</span>
+          <strong>Message Now</strong>
+        </Link>
+      </div>
+    </div>
+
+    {/* Form */}
+    <div className="rounded-[32px] border border-white/10 bg-[#081827]/80 p-6 backdrop-blur-xl md:p-8">
+      <form action="/api/contact" method="POST" className="space-y-5">
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-white/70">
+              Full Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              required
+              placeholder="Your name"
+              className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2f8c74] focus:ring-2 focus:ring-[#2f8c74]/20"
             />
+          </div>
 
-            <h2 className="text-3xl font-bold md:text-5xl">
-              Ready to build your next digital system?
-            </h2>
-
-            <p className="mx-auto mt-5 max-w-xl leading-8 text-white/65">
-              Let’s create a fast, secure, and future-ready IT solution for your
-              business.
-            </p>
-
-            <div className="mt-9 flex flex-col justify-center gap-4 sm:flex-row">
-  <Link
-    href="mailto:reymartdungca.dev@gmail.com"
-    className="rounded-full bg-[#2f8c74] px-8 py-4 text-sm font-bold text-white transition hover:bg-[#267762]"
-  >
-    Email Me
-  </Link>
-
-  <Link
-    href="https://wa.me/639365160775"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="rounded-full border border-white/15 bg-white/10 px-8 py-4 text-sm font-bold text-white transition hover:bg-white/15"
-  >
-    WhatsApp
-  </Link>
-
-  <Link
-    href="tel:09365160775"
-    className="rounded-full border border-white/15 bg-white/10 px-8 py-4 text-sm font-bold text-white transition hover:bg-white/15"
-  >
-    Call Now
-  </Link>
-</div>
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-white/70">
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email"
+              required
+              placeholder="you@example.com"
+              className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2f8c74] focus:ring-2 focus:ring-[#2f8c74]/20"
+            />
           </div>
         </div>
-      </section>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-white/70">
+              Phone Number
+            </label>
+            <input
+              type="text"
+              name="phone"
+              placeholder="Your phone number"
+              className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2f8c74] focus:ring-2 focus:ring-[#2f8c74]/20"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-white/70">
+              Service Needed
+            </label>
+            <select
+              name="service"
+              required
+              className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-sm text-white outline-none focus:border-[#2f8c74] focus:ring-2 focus:ring-[#2f8c74]/20"
+            >
+              <option value="" className="text-black">
+                Select service
+              </option>
+              <option value="Web Development" className="text-black">
+                Web Development
+              </option>
+              <option value="IT Automation" className="text-black">
+                IT Automation
+              </option>
+              <option value="Dashboard/System" className="text-black">
+                Dashboard/System
+              </option>
+              <option value="Cloud Solutions" className="text-black">
+                Cloud Solutions
+              </option>
+              <option value="Support & Maintenance" className="text-black">
+                Support & Maintenance
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-white/70">
+            Project Details
+          </label>
+          <textarea
+            name="message"
+            required
+            rows={6}
+            placeholder="Tell us about your project..."
+            className="w-full resize-none rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2f8c74] focus:ring-2 focus:ring-[#2f8c74]/20"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full rounded-full bg-[#2f8c74] px-8 py-4 text-sm font-bold text-white transition hover:bg-[#267762]"
+        >
+          Send Message
+        </button>
+
+        <p className="text-center text-xs leading-6 text-white/40">
+          You can also contact us directly through WhatsApp, phone, or email.
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
 
       {/* Footer */}
      
