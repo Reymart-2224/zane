@@ -12,25 +12,6 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#039;");
 }
 
-async function sendTelegramMessage(text: string) {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-
-  if (!botToken || !chatId) return;
-
-  await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text,
-      parse_mode: "HTML",
-    }),
-  });
-}
-
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
@@ -48,17 +29,26 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!process.env.RESEND_API_KEY || !process.env.CONTACT_EMAIL_TO) {
+      console.error("Missing Resend environment variables.");
+
+      return NextResponse.redirect(
+        new URL("/?message=config-error#contact", request.url),
+        303
+      );
+    }
+
     const safeName = escapeHtml(name);
     const safeEmail = escapeHtml(email);
     const safePhone = escapeHtml(phone || "Not provided");
     const safeService = escapeHtml(service);
-    const safeMessage = escapeHtml(message);
+    const safeMessage = escapeHtml(message).replaceAll("\n", "<br />");
 
     await resend.emails.send({
       from:
         process.env.CONTACT_EMAIL_FROM ||
         "ZANE IT Solutions <onboarding@resend.dev>",
-      to: [process.env.CONTACT_EMAIL_TO || "reymartdungca.dev@gmail.com"],
+      to: [process.env.CONTACT_EMAIL_TO],
       replyTo: email,
       subject: `New ZANE inquiry from ${name}`,
       html: `
@@ -73,24 +63,10 @@ export async function POST(request: Request) {
           <hr />
 
           <p><strong>Project Details:</strong></p>
-          <p>${safeMessage.replaceAll("\n", "<br />")}</p>
+          <p>${safeMessage}</p>
         </div>
       `,
     });
-
-    await sendTelegramMessage(
-      [
-        "🚀 <b>New ZANE Website Inquiry</b>",
-        "",
-        `<b>Name:</b> ${safeName}`,
-        `<b>Email:</b> ${safeEmail}`,
-        `<b>Phone:</b> ${safePhone}`,
-        `<b>Service:</b> ${safeService}`,
-        "",
-        "<b>Message:</b>",
-        safeMessage,
-      ].join("\n")
-    );
 
     return NextResponse.redirect(
       new URL("/?message=success#contact", request.url),

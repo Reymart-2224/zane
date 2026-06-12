@@ -67,23 +67,30 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage({
+export default async function HomePage({
   searchParams,
 }: {
-  searchParams?: {
+  searchParams?: Promise<{
     message?: string;
-  };
+  }>;
 }) {
-  const formMessage = searchParams?.message;
+  const resolvedSearchParams = await searchParams;
+  const formMessage = resolvedSearchParams?.message;
+
   return (
   <main className="min-h-screen overflow-x-hidden bg-[#06121f] text-white">
       {/* Background effects */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(47,140,116,0.35),transparent_35%),radial-gradient(circle_at_top_right,rgba(41,101,137,0.45),transparent_35%),linear-gradient(180deg,#06121f_0%,#020712_100%)]" />
-        <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-[#2f8c74]/20 blur-[130px]" />
-        <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-[#296589]/25 blur-[120px]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:70px_70px] opacity-30" />
-      </div>
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(47,140,116,0.35),transparent_35%),radial-gradient(circle_at_top_right,rgba(41,101,137,0.45),transparent_35%),linear-gradient(180deg,#06121f_0%,#020712_100%)]" />
+  <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-[#2f8c74]/20 blur-[130px]" />
+  <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-[#296589]/25 blur-[120px]" />
+  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:70px_70px] opacity-30" />
+
+  {/* Particles */}
+  <div className="zane-particles zane-particles-one" />
+  <div className="zane-particles zane-particles-two" />
+  <div className="zane-particles zane-particles-three" />
+</div>
 
 {/* Header */}
 <header className="fixed left-0 top-0 z-[9999] w-full border-b border-white/10 bg-[#06121f]/85 backdrop-blur-xl">
