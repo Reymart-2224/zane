@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import MessengerChatBox from "@/components/MessengerChatBox";
 import MessengerFloatingBox from "@/components/MessengerFloatingBox";
 import type { Metadata } from "next";
@@ -52,6 +53,7 @@ type Listing = {
 
 type Client = {
   company_name?: string;
+  companySlug?: string;
   contact_name?: string;
   email?: string;
   phone?: string;
@@ -116,6 +118,30 @@ function buildQueryString(
 
   return queryString ? `?${queryString}` : "";
 }
+function slugToCompanyNameLower(slug: string) {
+  return slug.replace(/-/g, " ").toLowerCase().trim();
+}
+
+async function getClientByCompanySlug(companySlug: string) {
+  const companyNameLower = slugToCompanyNameLower(companySlug);
+
+  const clientQuery = query(
+    collection(db, "clients"),
+    where("companyNameLower", "==", companyNameLower)
+  );
+
+  const clientSnapshot = await getDocs(clientQuery);
+
+  if (clientSnapshot.empty) {
+    return null;
+  }
+
+  return {
+    id: clientSnapshot.docs[0].id,
+    ...(clientSnapshot.docs[0].data() as Client),
+  };
+}
+
 
 export async function generateMetadata({
   params,
@@ -218,6 +244,13 @@ export default async function CompanyListingsPage({
   searchParams,
 }: PageProps) {
   const { companySlug } = await params;
+  const existingClient = await getClientByCompanySlug(companySlug);
+
+  if (!existingClient) {
+    redirect("/");
+  }
+
+
   const filters = (await searchParams) || {};
 
   const keyword = filters.q || "";
@@ -240,7 +273,7 @@ export default async function CompanyListingsPage({
     id: listingDoc.id,
   }));
 
-  let client: Client | null = null;
+let client: Client | null = existingClient;
 
   const clientId = listings[0]?.clientId;
 
