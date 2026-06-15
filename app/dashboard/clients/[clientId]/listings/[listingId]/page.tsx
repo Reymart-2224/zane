@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase";
+import { slugify } from "@/lib/slugify";
 import dynamic from "next/dynamic";
 import "react-quill-new/dist/quill.snow.css";
 
@@ -222,12 +223,14 @@ export default function ListingDetailsPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...form,
-          companyName: listing.companyName,
-          featuredImage,
-          sliderImages,
-        }),
+   body: JSON.stringify({
+  ...form,
+  listingSlug: slugify(form.title),
+  companyName: listing.companyName,
+  companySlug: listing.companySlug,
+  featuredImage,
+  sliderImages,
+}),
       });
 
       const data = await res.json();
@@ -322,7 +325,7 @@ export default function ListingDetailsPage() {
             </h1>
 
             <p className="mt-1 break-all text-sm text-gray-400">
-              Public URL: /{listing.companySlug}/{listing.listingSlug}
+       Public URL: /{listing.companySlug}/{listing.listingSlug || slugify(form.title)}
             </p>
           </div>
 

@@ -20,6 +20,8 @@ type Client = {
   phone?: string;
   address?: string;
   username: string;
+  facebookMessenger?: string;
+  facebookPageId?: string;
   role?: string;
   status?: boolean;
 };
@@ -104,17 +106,18 @@ export default function ClientDetailsPage() {
     {}
   );
 
-  const [form, setForm] = useState({
-    company_name: "",
-    contact_name: "",
-    email: "",
-    phone: "",
-    address: "",
-    username: "",
-    password: "",
-    status: true,
-  });
-
+const [form, setForm] = useState({
+  company_name: "",
+  contact_name: "",
+  email: "",
+  phone: "",
+  address: "",
+  username: "",
+  facebookMessenger: "",
+  facebookPageId: "",
+  password: "",
+  status: true,
+});
   const [listingForm, setListingForm] = useState({
     title: "",
     listingCategory: "property",
@@ -258,6 +261,8 @@ export default function ClientDetailsPage() {
         phone: loadedClient.phone || "",
         address: loadedClient.address || "",
         username: loadedClient.username || "",
+        facebookMessenger: loadedClient.facebookMessenger || "",
+        facebookPageId: loadedClient.facebookPageId || "",
         password: "",
         status: loadedClient.status === false ? false : true,
       });
@@ -1081,6 +1086,22 @@ export default function ClientDetailsPage() {
                     value={form.phone}
                     onChange={handleChange}
                   />
+     <InputField
+  label="Facebook Messenger Username"
+  name="facebookMessenger"
+  value={form.facebookMessenger}
+  onChange={handleChange}
+  placeholder="Example: reymart.dungca"
+/>
+
+<InputField
+  label="Facebook Page ID"
+  name="facebookPageId"
+  value={form.facebookPageId}
+  onChange={handleChange}
+  placeholder="Example: 123456789012345"
+/>
+
 
                   <InputField
                     label="Username"

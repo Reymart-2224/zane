@@ -81,7 +81,6 @@ export async function GET(request: Request, { params }: RouteParams) {
     );
   }
 }
-
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
     const { listingId } = await params;
@@ -95,41 +94,61 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     const body = await request.json();
 
-    const {
-      companyName,
-      title,
-      listingCategory,
-      type,
-      address,
-      price,
-      status,
-      description,
-      featuredImage,
-      sliderImages,
-    } = body;
+    console.log("PATCH BODY:", body);
+    console.log("TITLE:", body.title);
+    console.log("GENERATED SLUG:", slugify(body.title || ""));
 
-    if (!title || !listingCategory) {
+const {
+  companyName,
+  companySlug,
+  title,
+  listingSlug,
+  listingCategory,
+  type,
+  address,
+  price,
+  status,
+  description,
+  featuredImage,
+  sliderImages,
+} = body;
+
+const cleanTitle = String(title || "").trim();
+
+    if (!cleanTitle || !listingCategory) {
       return NextResponse.json(
         { error: "Missing required listing fields" },
         { status: 400 }
       );
     }
 
-    const updateData: Record<string, unknown> = {
-      title: title.trim(),
-      listingSlug: slugify(title),
-      listingCategory,
-      type: type?.trim() || "",
-      address: address?.trim() || "",
-      price: price || "",
-      status: status || "active",
-      description: description || "",
-      updatedAt: serverTimestamp(),
-    };
+ 
+const generatedListingSlug = listingSlug || slugify(cleanTitle);
+
+const updateData: Record<string, unknown> = {
+  title: cleanTitle,
+  listingSlug: generatedListingSlug,
+  listingCategory,
+  type: type?.trim() || "",
+  address: address?.trim() || "",
+  price: price || "",
+  status: status || "active",
+  description: description || "",
+  updatedAt: serverTimestamp(),
+};
+
+if (companyName) {
+  updateData.companyName = companyName.trim();
+  updateData.companySlug = companySlug || slugify(companyName);
+}
 
     if (companyName) {
-      updateData.companyName = companyName.trim();
-      updateData.companySlug = slugify(companyName);
+      const cleanCompanyName = String(companyName).trim();
+
+      updateData.companyName = cleanCompanyName;
+
+      // ✅ Save client/company slug separately
+      updateData.companySlug = slugify(cleanCompanyName);
     }
 
     if (featuredImage !== undefined) {
@@ -140,11 +159,15 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       updateData.sliderImages = sliderImages;
     }
 
+    console.log("UPDATE DATA:", updateData);
+
     const listingRef = doc(db, "listings", listingId);
+
     await updateDoc(listingRef, updateData);
 
     return NextResponse.json({
       message: "Listing updated successfully",
+      listingSlug: generatedListingSlug,
     });
   } catch (error) {
     console.error("Update listing error:", error);
