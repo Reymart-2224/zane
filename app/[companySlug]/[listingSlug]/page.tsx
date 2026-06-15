@@ -311,93 +311,95 @@ const facebookPageId = client?.facebookPageId || "";
         </div>
       </header>
 
-      {/* Listing Content */}
-      <section className="mx-auto w-full max-w-[1120px] flex-1 px-4 py-8 md:py-10">
-        <div className="grid grid-cols-1 gap-8 ">
-          {/* Left Images */}
-          <div>
-           <ListingImageZoom images={galleryImages} title={listing.title} />
-          </div>
+    {/* Listing Content */}
+<section className="mx-auto w-full max-w-[1120px] flex-1 px-4 py-8 md:py-10">
+  <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_390px] lg:items-start">
+    {/* Left: Gallery + Details + Description */}
+    <div className="min-w-0 space-y-8">
+      <ListingImageZoom images={galleryImages} title={listing.title} />
 
-          {/* Right Details */}
-          <aside className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-7">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex rounded-full bg-[var(--zl-primary-light)] px-3 py-1 text-xs font-semibold capitalize text-[var(--zl-primary)]">
-                {listing.listingCategory || "listing"}
-              </span>
+      <aside className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-7">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex rounded-full bg-[var(--zl-primary-light)] px-3 py-1 text-xs font-semibold capitalize text-[var(--zl-primary)]">
+            {listing.listingCategory || "listing"}
+          </span>
 
-              {listing.type && (
-                <span className="inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
-                  {listing.type}
-                </span>
-              )}
-            </div>
-
-            <h1 className="mt-4 text-3xl font-bold leading-tight text-[#111827] md:text-4xl">
-              {listing.title}
-            </h1>
-
-            <p className="mt-3 flex items-start gap-2 text-sm leading-relaxed text-gray-500">
-              <MapPinIcon />
-              <span>{listing.address || "No location"}</span>
-            </p>
-
-            {listing.price && (
-              <div className="mt-6 rounded-2xl bg-[#f8fafc] p-5">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                  Price
-                </p>
-
-                <p className="mt-1 flex items-center gap-2 text-3xl font-bold text-[var(--zl-primary)]">
-                  <PesoIcon />
-                  <span>{formatPeso(listing.price).replace("₱", "")}</span>
-                </p>
-              </div>
-            )}
-
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-  {companyPhone && (
-    <a
-      href={`tel:${companyPhone}`}
-      className="inline-flex flex-1 items-center justify-center rounded-full bg-[#296589] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-    >
-      Call Now
-    </a>
-  )}
-
-  {companyEmail && (
-    <a
-      href={`mailto:${companyEmail}`}
-      className="inline-flex flex-1 items-center justify-center rounded-full border border-[#296589] bg-[white] px-5 py-3 text-sm font-semibold text-[#296589] transition hover:bg-[#1d4e6d] hover:text-white"
-    >
-      Email
-    </a>
-  )}
-</div>
-          </aside>
+          {listing.type && (
+            <span className="inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
+              {listing.type}
+            </span>
+          )}
         </div>
 
-        {/* Description */}
-    <div className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
-  <h3 className="text-xl font-bold text-[#111827]">More Information</h3>
+        <h1 className="mt-4 text-3xl font-bold leading-tight text-[#111827] md:text-4xl">
+          {listing.title}
+        </h1>
 
-  <div
-    className="zl-wysiwyg-content mt-5"
-    dangerouslySetInnerHTML={{
-      __html: cleanDescription(listing.description),
-    }}
-  />
-</div>
-<ListingLeadForm
-  listingId={listing.id}
-  listingTitle={listing.title}
-  companySlug={companySlug}
-  listingSlug={listingSlug}
-  companyName={companyName}
-  clientId={listing.clientId}
-/>
+        <p className="mt-3 flex items-start gap-2 text-sm leading-relaxed text-gray-500">
+          <MapPinIcon />
+          <span>{listing.address || "No location"}</span>
+        </p>
 
-      </section>
+        {listing.price && (
+          <div className="mt-6 rounded-2xl bg-[#f8fafc] p-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+              Price
+            </p>
+
+            <p className="mt-1 flex items-center gap-2 text-3xl font-bold text-[var(--zl-primary)]">
+              <PesoIcon />
+              <span>{formatPeso(listing.price).replace("₱", "")}</span>
+            </p>
+          </div>
+        )}
+
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          {companyPhone && (
+            <a
+              href={`tel:${companyPhone}`}
+              className="inline-flex flex-1 items-center justify-center rounded-full bg-[#296589] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            >
+              Call Now
+            </a>
+          )}
+
+          {companyEmail && (
+            <a
+              href={`mailto:${companyEmail}`}
+              className="inline-flex flex-1 items-center justify-center rounded-full border border-[#296589] bg-white px-5 py-3 text-sm font-semibold text-[#296589] transition hover:bg-[#1d4e6d] hover:text-white"
+            >
+              Email
+            </a>
+          )}
+        </div>
+      </aside>
+
+      {/* Description */}
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
+        <h3 className="text-xl font-bold text-[#111827]">More Information</h3>
+
+        <div
+          className="zl-wysiwyg-content mt-5"
+          dangerouslySetInnerHTML={{
+            __html: cleanDescription(listing.description),
+          }}
+        />
+      </div>
+    </div>
+
+    {/* Right: Lead Form */}
+    <div className="lg:sticky lg:top-6">
+      <ListingLeadForm
+        listingId={listing.id}
+        listingTitle={listing.title}
+        companySlug={companySlug}
+        listingSlug={listingSlug}
+        companyName={companyName}
+        clientId={listing.clientId}
+      />
+    </div>
+  </div>
+</section>
 
       {/* Footer */}
       <footer className="mt-auto border-t border-gray-200 bg-white">
