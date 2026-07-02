@@ -30,6 +30,15 @@ body {
 }
 
 
+.listings .test{
+  background-image: url("/assets/media/list-bg.png")!important;
+  background-size: contain;
+  background-color:white;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+}
+
+
 .listings a.text-white{
   color: #ffffff!important;
 }

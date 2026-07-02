@@ -12,6 +12,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/firebase";
 
 export async function GET() {
+  
   try {
     const clientsRef = collection(db, "clients");
     const q = query(clientsRef, orderBy("createdAt", "desc"));
@@ -58,15 +59,22 @@ export async function POST(request: Request) {
       );
     }
 
+    function normalize(value: string) {
+      return String(value || "").trim().toLowerCase();
+    }
+
     const cleanUsername = username.trim();
-    const cleanEmail = email.trim();
+    const cleanUsernameLower = normalize(username);
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanCompanyNameLower = normalize(company_name);
 
     const clientsRef = collection(db, "clients");
 
     const usernameQuery = query(
       clientsRef,
-      where("username", "==", cleanUsername)
+      where("usernameLower", "==", cleanUsernameLower)
     );
+
     const usernameSnapshot = await getDocs(usernameQuery);
 
     if (!usernameSnapshot.empty) {
@@ -76,7 +84,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const emailQuery = query(clientsRef, where("email", "==", cleanEmail));
+    const emailQuery = query(
+      clientsRef,
+      where("email", "==", cleanEmail)
+    );
+
     const emailSnapshot = await getDocs(emailQuery);
 
     if (!emailSnapshot.empty) {
@@ -86,18 +98,39 @@ export async function POST(request: Request) {
       );
     }
 
+    const companyLowerQuery = query(
+      clientsRef,
+      where("companyNameLower", "==", cleanCompanyNameLower)
+    );
+
+    const companyLowerSnapshot = await getDocs(companyLowerQuery);
+
+    if (!companyLowerSnapshot.empty) {
+      return NextResponse.json(
+        { error: "Company name already exists. Please use another name." },
+        { status: 409 }
+      );
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const docRef = await addDoc(clientsRef, {
       company_name: company_name.trim(),
       contact_name: contact_name.trim(),
+      companyNameLower: cleanCompanyNameLower,
+
       email: cleanEmail,
+
+      username: cleanUsername,
+      usernameLower: cleanUsernameLower,
+
       phone: phone?.trim() || "",
       address: address?.trim() || "",
-      username: cleanUsername,
+
       password: hashedPassword,
       role: "client",
       status: status === false ? false : true,
+
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
