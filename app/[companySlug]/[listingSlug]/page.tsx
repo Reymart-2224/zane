@@ -395,7 +395,7 @@ const pageStyles = {
               Price
             </p>
 
-            <p className="mt-1 flex items-center gap-2 text-3xl font-bold text-[var(--zl-primary)]">
+            <p className="mt-1 flex items-center gap-2 text-3xl font-bold text-black">
               <PesoIcon />
               <span>{formatPeso(listing.price).replace("₱", "")}</span>
             </p>
