@@ -97,7 +97,13 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     // ✅ Added Facebook Page ID
     const facebookPageId = String(body.facebookPageId || "").trim();
-
+const logoUrl = String(body.logoUrl || "").trim();
+const listingBg = String(body.listingBg || "").trim();
+const headerColor = String(body.headerColor || "#ffffff").trim() || "#ffffff";
+const headerTextColor =
+  String(body.headerTextColor || "#1d2b35").trim() || "#1d2b35";
+const buttonColor =
+  String(body.buttonColor || "#296589").trim() || "#296589";
     if (!company_name || !contact_name || !email) {
       return NextResponse.json(
         { error: "Company name, contact name, and email are required." },
@@ -206,24 +212,30 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       );
     }
 
-    await updateDoc(clientRef, {
-      company_name,
-      companyNameLower: cleanCompanyNameLower,
+ await updateDoc(clientRef, {
+  company_name,
+  companyNameLower: cleanCompanyNameLower,
 
-      contact_name,
+  contact_name,
 
-      email,
-      emailLower: cleanEmailLower,
+  email,
+  emailLower: cleanEmailLower,
 
-      phone,
-      address,
+  phone,
+  address,
 
-      facebookMessenger,
-      facebookPageId,
+  facebookMessenger,
+  facebookPageId,
 
-      updatedAt: serverTimestamp(),
-    });
+  logoUrl,
+  listingBg,
 
+  headerColor,
+  headerTextColor,
+  buttonColor,
+
+  updatedAt: serverTimestamp(),
+});
     const updatedSnap = await getDoc(clientRef);
     const updatedData = updatedSnap.data() || {};
     const { password, ...safeUpdatedData } = updatedData;

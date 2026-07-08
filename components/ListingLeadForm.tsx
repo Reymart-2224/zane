@@ -9,6 +9,9 @@ type ListingLeadFormProps = {
   listingSlug?: string;
   companyName?: string;
   clientId?: string;
+  headerBackground?: string;
+  headerTextColor?: string;
+  buttonColor?: string;
 };
 
 export default function ListingLeadForm({
@@ -18,6 +21,9 @@ export default function ListingLeadForm({
   listingSlug,
   companyName,
   clientId,
+  headerBackground = "#296589",
+  headerTextColor = "#ffffff",
+  buttonColor = "#296589",
 }: ListingLeadFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -78,20 +84,26 @@ export default function ListingLeadForm({
   };
 
   return (
-<form
-  onSubmit={submitLead}
-  className="mt-6 rounded-2xl bg-[#296589] p-5 text-white shadow-lg"
->
-   <h3 className="text-[18px] font-bold text-white">Send Inquiry</h3>
-      <p className="mt-1 text-sm text-white">
+    <form
+      onSubmit={submitLead}
+      className="mt-6 rounded-2xl border border-white/20 p-5 shadow-lg"
+      style={{
+        background: headerBackground,
+        color: headerTextColor,
+      }}
+    >
+      <h3 className="text-[18px] font-bold">Send Inquiry</h3>
+
+      <p className="mt-1 text-sm opacity-85">
         Fill out the form below and we will get back to you.
       </p>
 
       <div className="mt-5 space-y-3">
         <div>
-          <label className="mb-1 block text-xs font-semibold text-white">
+          <label className="mb-1 block text-xs font-semibold">
             Name *
           </label>
+
           <input
             type="text"
             value={name}
@@ -103,9 +115,10 @@ export default function ListingLeadForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-semibold text-white">
+          <label className="mb-1 block text-xs font-semibold">
             Email *
           </label>
+
           <input
             type="email"
             value={email}
@@ -117,9 +130,10 @@ export default function ListingLeadForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-semibold text-white">
+          <label className="mb-1 block text-xs font-semibold">
             Phone
           </label>
+
           <input
             type="text"
             value={phone}
@@ -130,9 +144,10 @@ export default function ListingLeadForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-semibold text-white">
+          <label className="mb-1 block text-xs font-semibold">
             Message *
           </label>
+
           <textarea
             value={message}
             required
@@ -157,12 +172,15 @@ export default function ListingLeadForm({
       )}
 
       <button
-        type="submit"
-        disabled={loading}
-        className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#296589] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {loading ? "Sending..." : "Submit Inquiry"}
-      </button>
+  type="submit"
+  disabled={loading}
+  className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+  style={{
+    color: headerBackground.includes("gradient") ? buttonColor : headerBackground,
+  }}
+>
+  {loading ? "Sending..." : "Submit Inquiry"}
+</button>
     </form>
   );
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import type { CSSProperties } from "react";
 import MessengerChatBox from "@/components/MessengerChatBox";
 import MessengerFloatingBox from "@/components/MessengerFloatingBox";
 import type { Metadata } from "next";
@@ -60,6 +61,11 @@ type Client = {
   address?: string;
   facebookMessenger?: string;
   facebookPageId?: string;
+  logoUrl?: string;
+   listingBg?: string;
+  headerColor?: string;
+  headerTextColor?: string;
+  buttonColor?: string;
 };
 
 function formatSlug(slug: string) {
@@ -199,6 +205,7 @@ export async function generateMetadata({
 
   const pageUrl = `${siteUrl}/${companySlug}`;
 
+
   return {
     title: pageTitle,
     description: pageDescription,
@@ -293,8 +300,34 @@ const companyEmail = client?.email || "";
 const companyAddress = client?.address || "";
 const facebookMessenger = client?.facebookMessenger || "";
 const facebookPageId = client?.facebookPageId || "";
-console.log("FACEBOOK PAGE ID:", facebookPageId);
-console.log("FACEBOOK MESSENGER:", facebookMessenger);
+
+const companyLogo = client?.logoUrl || "";
+const headerBackground =
+  client?.headerColor ||
+  "linear-gradient(135deg, #0f2d3a, #296589, #1d4f63)";
+const headerTextColor = client?.headerTextColor || "#ffffff";
+const buttonColor = client?.buttonColor || "#296589";
+
+const listingBackground = client?.listingBg || "";
+const brandStyles = {
+  "--zl-primary": buttonColor,
+  "--zl-header-text": headerTextColor,
+} as CSSProperties;
+
+
+const pageStyles = {
+  ...brandStyles,
+  ...(listingBackground
+    ? {
+        backgroundImage: ` linear-gradient(rgb(255 255 255 / 67%), rgb(255 255 255)), url(${listingBackground})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
+      }
+    : {}),
+} as CSSProperties;
+
   const categories = Array.from(
     new Set(
       listings
@@ -365,88 +398,109 @@ console.log("FACEBOOK MESSENGER:", facebookMessenger);
     });
 
   return (
-    <main className="flex min-h-screen flex-col bg-gradient-to-b from-[#d8f3ff] via-[#edf9ff] to-white  text-[#111827] listings">
-      {/* Header */}
-      <header className="border-b border-white/20 bg-gradient-to-br from-[#0f2d3a] via-[#296589] to-[#1d4f63] shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(0,0,0,0.35),0_12px_35px_rgba(0,0,0,0.18)]">
-        <div className="mx-auto max-w-[1120px] px-4 py-6">
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white md:text-4xl">
-                {companyName}
-              </h1>
- {companyAddress && ( <p className="mt-2 flex max-w-xl items-start gap-2 text-sm leading-relaxed text-white"> <MapPinIcon /> <span>{companyAddress}</span> </p> )}
-              
-            </div>
-<div className="w-full md:w-auto md:min-w-[340px]">
-  <div className="flex flex-col gap-3 text-white">
- 
+  <main
+  className="flex min-h-screen flex-col  via-[#edf9ff] to-white text-[#111827] listings"
+    style={pageStyles}
+>
+   {/* Header */}
+     <header
+  className="border-b border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(0,0,0,0.25),0_12px_35px_rgba(0,0,0,0.14)]"
+  style={{
+    background: headerBackground,
+    color: headerTextColor,
+  }}
+>
+  <div className="mx-auto max-w-[1120px] px-4 py-6">
+    <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+     <div className="min-w-0">
+  {companyLogo ? (
+    <img
+      src={companyLogo}
+      alt={`${companyName} logo`}
+      className="w-auto max-w-[291px] object-contain"
+    />
+  ) : (
+    <>
+      <h1 className="text-3xl font-bold md:text-4xl">
+        {companyName}
+      </h1>
 
-    {/* Phone */}
-    <div className="flex items-center gap-3">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/25 text-white">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106a1.125 1.125 0 00-1.173.417l-.97 1.293a1.125 1.125 0 01-1.21.38 12.035 12.035 0 01-7.143-7.143 1.125 1.125 0 01.38-1.21l1.293-.97a1.125 1.125 0 00.417-1.173L6.963 3.102A1.125 1.125 0 005.872 2.25H4.5A2.25 2.25 0 002.25 4.5v2.25z"
-          />
-        </svg>
-      </div>
-
-      {companyPhone ? (
-        <a
-          href={`tel:${companyPhone}`}
-          className="text-sm font-semibold text-white transition hover:underline"
-        >
-          {companyPhone}
-        </a>
-      ) : (
-        <span className="text-sm text-white/60">Not available</span>
+      {companyAddress && (
+        <p className="mt-3 flex max-w-xl items-start gap-2 text-sm leading-relaxed opacity-90">
+          <MapPinIcon />
+          <span>{companyAddress}</span>
+        </p>
       )}
-    </div>
-
-    {/* Email */}
-    <div className="flex items-center gap-3">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/25 text-white">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M21.75 6.75v10.5A2.25 2.25 0 0119.5 19.5h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0l-7.5-4.615a2.25 2.25 0 01-1.07-1.916V6.75"
-          />
-        </svg>
-      </div>
-
-      {companyEmail ? (
-        <a
-          href={`mailto:${companyEmail}`}
-          className="break-all text-sm font-semibold text-white transition hover:underline"
-        >
-          {companyEmail}
-        </a>
-      ) : (
-        <span className="text-sm text-white/60">Not available</span>
-      )}
-    </div>
-  </div>
+    </>
+  )}
 </div>
+
+      <div className="w-full md:w-auto md:min-w-[340px]">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-current/25">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106a1.125 1.125 0 00-1.173.417l-.97 1.293a1.125 1.125 0 01-1.21.38 12.035 12.035 0 01-7.143-7.143 1.125 1.125 0 01.38-1.21l1.293-.97a1.125 1.125 0 00.417-1.173L6.963 3.102A1.125 1.125 0 005.872 2.25H4.5A2.25 2.25 0 002.25 4.5v2.25z"
+                />
+              </svg>
+            </div>
+
+            {companyPhone ? (
+              <a
+                href={`tel:${companyPhone}`}
+                className="text-sm font-semibold transition hover:underline text-[var(--zl-primary)]"
+              >
+                {companyPhone}
+              </a>
+            ) : (
+              <span className="text-sm opacity-60">Not available</span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-current/25">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21.75 6.75v10.5A2.25 2.25 0 0119.5 19.5h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0l-7.5-4.615a2.25 2.25 0 01-1.07-1.916V6.75"
+                />
+              </svg>
+            </div>
+
+            {companyEmail ? (
+              <a
+                href={`mailto:${companyEmail}`}
+                className="break-all text-sm font-semibold transition hover:underline text-[var(--zl-primary)]"
+              >
+                {companyEmail}
+              </a>
+            ) : (
+              <span className="text-sm opacity-60">Not available</span>
+            )}
           </div>
         </div>
-      </header>
+      </div>
+    </div>
+  </div>
+</header>
 
       {/* Listings */}
       <section className="mx-auto w-full max-w-[1120px] flex-1 px-4 py-10">
@@ -734,7 +788,7 @@ function MessengerIcon() {
 function MapPinIcon() {
   return (
     <svg
-      className="mt-0.5 h-4 w-4 shrink-0 text-[var(--zl-primary)]"
+      className="mt-0.5 h-4 w-4 shrink-0 text-[#f07f25]"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

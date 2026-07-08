@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import MessengerChatBox from "@/components/MessengerChatBox";
 import MessengerFloatingBox from "@/components/MessengerFloatingBox";
@@ -44,9 +45,13 @@ type Client = {
   phone?: string;
   address?: string;
   facebookMessenger?: string;
-    facebookPageId?: string;
+  facebookPageId?: string;
+  logoUrl?: string;  
+   listingBg?: string;
+  headerColor?: string;
+  headerTextColor?: string;
+  buttonColor?: string;
 };
-
 function formatPeso(price?: string) {
   if (!price) return "";
 
@@ -231,85 +236,129 @@ export default async function PublicListingPage({ params }: PageProps) {
   const companyName =
     client?.company_name || listing.companyName || "Company Listings";
 
-  const companyPhone = client?.phone || "";
-  const companyEmail = client?.email || "";
-  const companyAddress = client?.address || "";
+ const companyPhone = client?.phone || "";
+const companyEmail = client?.email || "";
+const companyAddress = client?.address || "";
 const facebookMessenger = client?.facebookMessenger || "";
 const facebookPageId = client?.facebookPageId || "";
 
+const companyLogo = client?.logoUrl || "";
+
+const headerBackground =
+  client?.headerColor ||
+  "linear-gradient(135deg, #0f2d3a, #296589, #1d4f63)";
+
+const headerTextColor = client?.headerTextColor || "#ffffff";
+const buttonColor = client?.buttonColor || "#296589";
+const listingBackground = client?.listingBg || "";
+const brandStyles = {
+  "--zl-primary": buttonColor,
+  "--zl-primary-light": `${buttonColor}18`,
+  "--zl-header-text": headerTextColor,
+} as CSSProperties;
   const galleryImages = [
     ...(listing.featuredImage ? [listing.featuredImage] : []),
     ...(Array.isArray(listing.sliderImages) ? listing.sliderImages : []),
   ];
 
+
+  
+const pageStyles = {
+  ...brandStyles,
+  ...(listingBackground
+    ? {
+        backgroundImage: ` linear-gradient(rgb(255 255 255 / 67%), rgb(255 255 255)), url(${listingBackground})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
+      }
+    : {}),
+} as CSSProperties;
   return (
-    <main className="flex min-h-screen flex-col bg-gradient-to-b from-[#d8f3ff] via-[#edf9ff] to-white  text-[#111827] listings">
-      {/* Header */}
-        <header className="border-b border-white/20 bg-gradient-to-br from-[#0f2d3a] via-[#296589] to-[#1d4f63] shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(0,0,0,0.35),0_12px_35px_rgba(0,0,0,0.18)]">
-        <div className="mx-auto max-w-[1120px] px-4 py-6">
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            {/* Left */}
-            <div>
-              <Link
-                href={`/${companySlug}`}
-                className="mb-3 inline-flex text-sm font-semibold text-white hover:underline"
-              >
-                ← Back to listings
-              </Link>
+  <main className="flex min-h-screen flex-col bg-[white] to-white  text-[#111827] listings"   style={pageStyles}>
+    {/* Header */}
+       <header
+  className="border-b border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(0,0,0,0.25),0_12px_35px_rgba(0,0,0,0.14)]"
+  style={{
+    background: headerBackground,
+    color: headerTextColor,
+  }}
+>
+  <div className="mx-auto max-w-[1120px] px-4 py-6">
+    <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+      <div className="min-w-0">
+        <Link
+          href={`/${companySlug}`}
+          className="mb-4 inline-flex text-sm font-semibold opacity-90 transition hover:underline hover:opacity-100"
+        >
+          ← Back to listings
+        </Link>
 
-              <h1 className="text-3xl font-bold text-white md:text-4xl">
-                {companyName}
-              </h1>
+        {companyLogo ? (
+          <img
+            src={companyLogo}
+            alt={`${companyName} logo`}
+            className="w-auto max-w-[291px] object-contain"
+          />
+        ) : (
+          <>
+            <h1 className="text-3xl font-bold md:text-4xl">
+              {companyName}
+            </h1>
 
-              {companyAddress && (
-                <p className="mt-2 flex max-w-xl items-start gap-2 text-sm leading-relaxed text-white">
-                  <MapPinIcon />
-                  <span>{companyAddress}</span>
-                </p>
+            {companyAddress && (
+              <p className="mt-3 flex max-w-xl items-start gap-2 text-sm leading-relaxed opacity-90">
+                <MapPinIcon />
+                <span>{companyAddress}</span>
+              </p>
+            )}
+          </>
+        )}
+      </div>
+
+      <div className="w-full md:w-auto md:min-w-[340px]">
+        <div className="rounded-2xl border border-current/20 bg-white/10 p-4 backdrop-blur-sm">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide opacity-80">
+            Contact Details
+          </p>
+
+          <div className="space-y-3">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-sm opacity-80">Phone</span>
+
+              {companyPhone ? (
+                <a
+                  href={`tel:${companyPhone}`}
+                  className="text-sm font-semibold transition hover:underline"
+                >
+                  {companyPhone}
+                </a>
+              ) : (
+                <span className="text-sm opacity-60">Not available</span>
               )}
             </div>
 
-            {/* Right */}
-            <div className="w-full rounded-2xl border border-gray-200 bg-[#f8fafc] p-4 md:w-auto md:min-w-[340px]">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-black">
-                Contact Details
-              </p>
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-sm opacity-80">Email</span>
 
-              <div className="space-y-3">
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                  <span className="text-sm text-black">Phone</span>
-
-                  {companyPhone ? (
-                    <a
-                      href={`tel:${companyPhone}`}
-                      className="text-sm font-semibold text-[#296589] hover:underline"
-                    >
-                      {companyPhone}
-                    </a>
-                  ) : (
-                    <span className="text-sm text-gray-400">Not available</span>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                  <span className="text-sm text-black">Email</span>
-
-                  {companyEmail ? (
-                    <a
-                      href={`mailto:${companyEmail}`}
-                      className="break-all text-sm font-semibold text-[#296589] hover:underline"
-                    >
-                      {companyEmail}
-                    </a>
-                  ) : (
-                    <span className="text-sm text-gray-400">Not available</span>
-                  )}
-                </div>
-              </div>
+              {companyEmail ? (
+                <a
+                  href={`mailto:${companyEmail}`}
+                  className="break-all text-sm font-semibold transition hover:underline"
+                >
+                  {companyEmail}
+                </a>
+              ) : (
+                <span className="text-sm opacity-60">Not available</span>
+              )}
             </div>
           </div>
         </div>
-      </header>
+      </div>
+    </div>
+  </div>
+</header>
 
     {/* Listing Content */}
 <section className="mx-auto w-full max-w-[1120px] flex-1 px-4 py-8 md:py-10">
@@ -390,13 +439,16 @@ const facebookPageId = client?.facebookPageId || "";
     {/* Right: Lead Form */}
     <div className="lg:sticky lg:top-6">
       <ListingLeadForm
-        listingId={listing.id}
-        listingTitle={listing.title}
-        companySlug={companySlug}
-        listingSlug={listingSlug}
-        companyName={companyName}
-        clientId={listing.clientId}
-      />
+  listingId={listing.id}
+  listingTitle={listing.title}
+  companySlug={companySlug}
+  listingSlug={listingSlug}
+  companyName={companyName}
+  clientId={listing.clientId}
+  headerBackground={headerBackground}
+  headerTextColor={headerTextColor}
+  buttonColor={buttonColor}
+/>
     </div>
   </div>
 </section>

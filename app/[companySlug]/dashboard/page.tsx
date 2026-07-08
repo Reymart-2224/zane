@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import { storage } from "@/lib/firebase";
 import dynamic from "next/dynamic";
 import "react-quill-new/dist/quill.snow.css";
@@ -11,7 +16,6 @@ import "react-quill-new/dist/quill.snow.css";
 const ReactQuill = dynamic(() => import("react-quill-new"), {
   ssr: false,
 });
-
 type ClientPortalUser = {
   id: string;
   company_name: string;
@@ -21,8 +25,12 @@ type ClientPortalUser = {
   address?: string;
   username?: string;
   role?: string;
+  logoUrl?: string;
+  headerColor?: string;
+  headerTextColor?: string;
+buttonColor?: string;
+listingBg?: string;
 };
-
 type Client = {
   id: string;
   company_name: string;
@@ -35,7 +43,12 @@ type Client = {
   role?: string;
   status?: boolean;
   facebookMessenger?: string;
-    facebookPageId?: string;
+  facebookPageId?: string;
+  logoUrl?: string;
+  headerColor?: string;
+  headerTextColor?: string;
+buttonColor?: string;
+listingBg?: string;
 };
 
 type Listing = {
@@ -117,7 +130,12 @@ export default function ClientPortalDashboardPage() {
   const [sliderImageFiles, setSliderImageFiles] = useState<File[]>([]);
   const [featuredPreview, setFeaturedPreview] = useState("");
   const [sliderPreviews, setSliderPreviews] = useState<string[]>([]);
-
+const [headerLogoFile, setHeaderLogoFile] = useState<File | null>(null);
+const [headerLogoPreview, setHeaderLogoPreview] = useState("");
+const [uploadingLogo, setUploadingLogo] = useState(false);
+const [listingBgFile, setListingBgFile] = useState<File | null>(null);
+const [listingBgPreview, setListingBgPreview] = useState("");
+const [uploadingListingBg, setUploadingListingBg] = useState(false);
   const [listingForm, setListingForm] = useState({
     title: "",
     listingCategory: "property",
@@ -237,7 +255,7 @@ export default function ClientPortalDashboardPage() {
   }, [leadSearch, leadStatusFilter, leadListingFilter]);
 
 
-  useEffect(() => {
+useEffect(() => {
   if (!client) return;
 
   setProfileForm({
@@ -248,7 +266,15 @@ export default function ClientPortalDashboardPage() {
     facebookMessenger: client.facebookMessenger || "",
     facebookPageId: client.facebookPageId || "",
     address: client.address || "",
+    logoUrl: client.logoUrl || "",
+listingBg: client.listingBg || "",
+headerColor: client.headerColor || "#ffffff",
+     headerTextColor: client.headerTextColor || "#1d2b35",
+    buttonColor: client.buttonColor || "#296589",
   });
+
+  setHeaderLogoPreview(client.logoUrl || "");
+  setListingBgPreview(client.listingBg || "");
 }, [client]);
 
   const [showProfileForm, setShowProfileForm] = useState(false);
@@ -262,8 +288,12 @@ const [profileForm, setProfileForm] = useState({
   facebookMessenger: "",
   facebookPageId: "",
   address: "",
+  logoUrl: "",
+  listingBg: "",
+  headerColor: "#ffffff",
+  headerTextColor: "#1d2b35",
+  buttonColor: "#296589",
 });
-
 
 const handleProfileChange = (
   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -275,12 +305,52 @@ const handleProfileChange = (
     [name]: value,
   }));
 };
+
+const handleListingBgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+
+  setError("");
+
+  if (!file) return;
+
+  const validationError = validateImage(file);
+
+  if (validationError) {
+    setError(validationError);
+    e.target.value = "";
+    return;
+  }
+
+  setListingBgFile(file);
+  setListingBgPreview(URL.createObjectURL(file));
+};
+
+const handleHeaderLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+
+  setError("");
+
+  if (!file) return;
+
+  const validationError = validateImage(file);
+
+  if (validationError) {
+    setError(validationError);
+    e.target.value = "";
+    return;
+  }
+
+  setHeaderLogoFile(file);
+  setHeaderLogoPreview(URL.createObjectURL(file));
+};
 const updateProfile = async (e: React.FormEvent) => {
   e.preventDefault();
 
   setError("");
   setSuccess("");
   setSavingProfile(true);
+  setUploadingLogo(false);
+  setUploadingListingBg(false);
 
   try {
     const storedClient = localStorage.getItem("clientPortalUser");
@@ -288,21 +358,49 @@ const updateProfile = async (e: React.FormEvent) => {
 
     const clientId = client?.id || parsedStoredClient?.id;
 
-    console.log("LOCAL STORAGE CLIENT:", parsedStoredClient);
-    console.log("CLIENT ID USED:", clientId);
-    console.log("PATCH URL:", `/api/clients/${clientId}`);
-
     if (!clientId) {
       setError("Client ID is missing. Please logout and login again.");
       return;
     }
 
+const oldLogoUrl = client?.logoUrl || "";
+const oldListingBg = client?.listingBg || "";
+
+let logoUrl = profileForm.logoUrl || "";
+let listingBg = profileForm.listingBg || "";
+
+   if (headerLogoFile) {
+  setUploadingLogo(true);
+
+  logoUrl = await uploadImageFile(
+    headerLogoFile,
+    `clients/${clientId}/logo`
+  );
+}
+
+if (listingBgFile) {
+  setUploadingListingBg(true);
+
+  listingBg = await uploadImageFile(
+    listingBgFile,
+    `clients/${clientId}/listing-bg`
+  );
+}
+
+
+
+ const payload = {
+  ...profileForm,
+  logoUrl,
+  listingBg,
+  headerColor: profileForm.headerColor || "#ffffff",
+};
     const res = await fetch(`/api/clients/${clientId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(profileForm),
+      body: JSON.stringify(payload),
     });
 
     const data = await res.json();
@@ -311,6 +409,15 @@ const updateProfile = async (e: React.FormEvent) => {
       setError(data.error || "Failed to update profile");
       return;
     }
+
+    // delete previous logo only after Firestore update succeeds
+if (headerLogoFile && oldLogoUrl && oldLogoUrl !== logoUrl) {
+  await deleteStorageFileByUrl(oldLogoUrl);
+}
+
+if (listingBgFile && oldListingBg && oldListingBg !== listingBg) {
+  await deleteStorageFileByUrl(oldListingBg);
+}
 
     setSuccess("Profile updated successfully.");
 
@@ -330,18 +437,29 @@ const updateProfile = async (e: React.FormEvent) => {
           address: data.client.address || "",
           facebookMessenger: data.client.facebookMessenger || "",
           facebookPageId: data.client.facebookPageId || "",
+          logoUrl: data.client.logoUrl || "",
+          listingBg: data.client.listingBg || "",
+          headerColor: data.client.headerColor || "#ffffff",
           username: data.client.username || "",
           role: data.client.role || "client",
         })
       );
     }
 
+    setHeaderLogoFile(null);
+    setHeaderLogoPreview(data.client?.logoUrl || logoUrl);
     setShowProfileForm(false);
+
+    setListingBgFile(null);
+setListingBgPreview(data.client?.listingBg || listingBg);
+
   } catch (err) {
     console.error(err);
     setError("Failed to update profile.");
   } finally {
     setSavingProfile(false);
+    setUploadingLogo(false);
+    setUploadingListingBg(false);
   }
 };
   const handleListingChange = (
@@ -448,7 +566,16 @@ const updateProfile = async (e: React.FormEvent) => {
 
     return await getDownloadURL(imageRef);
   };
+const deleteStorageFileByUrl = async (fileUrl?: string) => {
+  if (!fileUrl) return;
 
+  try {
+    const fileRef = ref(storage, fileUrl);
+    await deleteObject(fileRef);
+  } catch (err) {
+    console.warn("Old logo delete skipped:", err);
+  }
+};
   const createListing = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -674,46 +801,62 @@ const updateProfile = async (e: React.FormEvent) => {
       </main>
     );
   }
-
+  const portalThemeStyles = {
+  "--portal-button-color": client.buttonColor || "#296589",
+  "--portal-header-text-color": client.headerTextColor || "#1d2b35",
+} as React.CSSProperties;
   return (
-    <main className="flex min-h-screen flex-col bg-[#f8fafc] text-[#111827]">
-      <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto flex w-full max-w-[1700px] flex-col gap-4 px-4 py-5 sm:py-6 md:flex-row md:items-center md:justify-between">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-              Client Portal
-            </p>
+   <main
+  className="flex min-h-screen flex-col bg-[#f8fafc] text-[#111827]"
+  style={portalThemeStyles}
+>
+   <header
+  className="border-b border-gray-200"
+  style={{
+    backgroundColor: client.headerColor || "#ffffff",
+    color: client.headerTextColor || "#1d2b35",
+  }}
+>
+  <div className="mx-auto flex w-full max-w-[1700px] flex-col gap-4 px-4 py-5 sm:py-6 md:flex-row md:items-center md:justify-between">
+    <div className="flex min-w-0 items-center gap-4">
+     
 
-            <h1 className="mt-1 break-words text-2xl font-bold text-[#1d2b35] md:text-3xl">
-              {client.company_name}
-            </h1>
+      <div className="min-w-0">
+        <p className="text-xs font-semibold uppercase tracking-wide opacity-70">
+          Client Portal
+        </p>
 
-            <p className="mt-1 break-all text-sm text-gray-400">
-              Client ID: {client.id}
-            </p>
-          </div>
+        <h1 className="mt-1 break-words text-2xl font-bold md:text-3xl">
+          {client.company_name}
+        </h1>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <span
-              className={`inline-flex w-fit rounded-full px-4 py-2 text-xs font-semibold ${
-                client.status
-                  ? "bg-blue-50 text-[#296589]"
-                  : "bg-gray-100 text-gray-500"
-              }`}
-            >
-              {client.status ? "Active" : "Inactive"}
-            </span>
+        <p className="mt-1 break-all text-sm opacity-70">
+          Client ID: {client.id}
+        </p>
+      </div>
+    </div>
 
-            <button
-              type="button"
-              onClick={logout}
-              className="w-full rounded-full bg-[#296589] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 sm:w-auto"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <span
+        className={`inline-flex w-fit rounded-full px-4 py-2 text-xs font-semibold ${
+          client.status
+            ? "bg-blue-50 text-black"
+            : "bg-gray-100 text-gray-500"
+        }`}
+      >
+        {client.status ? "Active" : "Inactive"}
+      </span>
+
+      <button
+        type="button"
+        onClick={logout}
+        className="w-full rounded-full  px-5 py-3 text-sm font-semibold bg-[#1d2b35] text-white transition hover:opacity-90 sm:w-auto"
+      >
+        Logout
+      </button>
+    </div>
+  </div>
+</header>
 
       <section className="w-full flex-1">
         <div className="mx-auto w-full max-w-[1700px] px-3 py-4 sm:px-4 sm:py-6">
@@ -1179,7 +1322,99 @@ const updateProfile = async (e: React.FormEvent) => {
             onChange={handleProfileChange}
             placeholder="Example: yourPageID"
           />
+      <div className="space-y-1 md:col-span-2">
+  <label className="text-xs font-semibold text-gray-500">
+    Header Logo
+  </label>
 
+  <input
+    type="file"
+    accept="image/*"
+    onChange={handleHeaderLogoChange}
+    className="w-full rounded-xl border border-blue-100 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-200"
+  />
+
+  <p className="text-[11px] text-gray-400">
+    Maximum file size: {MAX_IMAGE_SIZE_MB}MB
+  </p>
+
+  {headerLogoPreview && (
+    <div className="mt-3 flex items-center gap-4 rounded-2xl border border-blue-100 bg-white p-4">
+      <img
+        src={headerLogoPreview}
+        alt="Logo Preview"
+        className="h-20 w-20 rounded-2xl border border-blue-100 object-contain p-2"
+      />
+
+      <div>
+        <p className="text-sm font-semibold text-[#1d2b35]">
+          Logo Preview
+        </p>
+        <p className="text-xs text-gray-400">
+          This logo will show in the portal header.
+        </p>
+      </div>
+    </div>
+  )}
+</div>
+<div className="space-y-1 md:col-span-2">
+  <label className="text-xs font-semibold text-gray-500">
+    Listing Background Image
+  </label>
+
+  <input
+    type="file"
+    accept="image/*"
+    onChange={handleListingBgChange}
+    className="w-full rounded-xl border border-blue-100 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-200"
+  />
+
+  <p className="text-[11px] text-gray-400">
+    This background will be used as the default public listing hero background. Maximum file size:{" "}
+    {MAX_IMAGE_SIZE_MB}MB
+  </p>
+
+  {listingBgPreview && (
+    <div className="mt-3 rounded-2xl border border-blue-100 bg-white p-4">
+      <img
+        src={listingBgPreview}
+        alt="Listing Background Preview"
+        className="h-48 w-full rounded-2xl border border-blue-100 object-cover"
+      />
+
+      <p className="mt-3 text-sm font-semibold text-[#1d2b35]">
+        Listing Background Preview
+      </p>
+
+      <p className="text-xs text-gray-400">
+        This image will show on public listing pages.
+      </p>
+    </div>
+  )}
+</div>
+<div className="space-y-1">
+
+
+ <ColorPickerField
+  label="Header Color"
+  name="headerColor"
+  value={profileForm.headerColor}
+  onChange={handleProfileChange}
+/>
+
+  <ColorPickerField
+  label="Header Text Color"
+  name="headerTextColor"
+  value={profileForm.headerTextColor}
+  onChange={handleProfileChange}
+/>
+
+<ColorPickerField
+  label="Button Color"
+  name="buttonColor"
+  value={profileForm.buttonColor}
+  onChange={handleProfileChange}
+/>
           <div className="space-y-1 md:col-span-2">
             <label className="text-xs font-semibold text-gray-500">
               Address
@@ -1194,21 +1429,33 @@ const updateProfile = async (e: React.FormEvent) => {
             />
           </div>
         </div>
-
+  </div>
         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <button
             type="button"
             onClick={() => {
               setShowProfileForm(false);
               setProfileForm({
-                company_name: client.company_name || "",
-                contact_name: client.contact_name || "",
-                email: client.email || "",
-                phone: client.phone || "",
-                facebookMessenger: client.facebookMessenger || "",
-                facebookPageId: client.facebookPageId || "",
-                address: client.address || "",
+              company_name: client.company_name || "",
+              contact_name: client.contact_name || "",
+              email: client.email || "",
+              phone: client.phone || "",
+              facebookMessenger: client.facebookMessenger || "",
+              facebookPageId: client.facebookPageId || "",
+              address: client.address || "",
+                logoUrl: client.logoUrl || "",
+                listingBg: client.listingBg || "",
+               headerColor: client.headerColor || "#ffffff",
+  headerTextColor: client.headerTextColor || "#1d2b35",
+  buttonColor: client.buttonColor || "#296589",
               });
+
+              setHeaderLogoFile(null);
+              setHeaderLogoPreview(client.logoUrl || "");
+
+              setListingBgFile(null);
+setListingBgPreview(client.listingBg || "");
+
             }}
             className="w-full rounded-full border border-blue-100 bg-white px-5 py-3 text-sm font-semibold text-gray-500 transition hover:bg-blue-50 sm:w-auto"
           >
@@ -1220,9 +1467,16 @@ const updateProfile = async (e: React.FormEvent) => {
             disabled={savingProfile}
             className="w-full rounded-full bg-[#296589] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
-            {savingProfile ? "Saving..." : "Save Profile"}
+         {savingProfile
+  ? uploadingLogo
+    ? "Uploading logo..."
+    : uploadingListingBg
+    ? "Uploading listing background..."
+    : "Saving..."
+  : "Save Profile"}
           </button>
-        </div>
+      
+         </div>
       </form>
     )}
 
@@ -1341,6 +1595,44 @@ function MessengerInfoCard({
       ) : (
         <p className="mt-1 text-sm font-semibold text-[#1d2b35]">-</p>
       )}
+    </div>
+  );
+}
+
+
+function ColorPickerField({
+  label,
+  name,
+  value,
+  onChange,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
+  return (
+    <div className="space-y-1">
+      <label className="text-xs font-semibold text-gray-500">{label}</label>
+
+      <div className="flex h-11 overflow-hidden rounded-xl border border-blue-100 bg-white">
+        <input
+          type="color"
+          name={name}
+          value={value || "#ffffff"}
+          onChange={onChange}
+          className="h-full w-16 cursor-pointer border-0 bg-white p-1"
+        />
+
+        <input
+          type="text"
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder="#ffffff"
+          className="h-full flex-1 px-4 text-sm text-[#1d2b35] outline-none"
+        />
+      </div>
     </div>
   );
 }
