@@ -391,7 +391,7 @@ const pageStyles = {
 
         {listing.price && (
           <div className="mt-6 rounded-2xl bg-[#f8fafc] p-5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+            <p className="text-xs font-semibold uppercase tracking-wide text-black">
               Price
             </p>
 
