@@ -292,7 +292,7 @@ const pageStyles = {
           href={`/${companySlug}`}
           className="mb-4 inline-flex text-sm font-semibold opacity-90 transition hover:underline hover:opacity-100"
         > 
-          ← Back to listings
+          ← Back to listings 
         </Link> 
 
         {companyLogo ? (
