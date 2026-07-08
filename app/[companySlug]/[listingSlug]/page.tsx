@@ -483,7 +483,7 @@ const pageStyles = {
 function MapPinIcon() {
   return (
     <svg
-      className="mt-0.5 h-4 w-4 shrink-0 text-[var(--zl-primary)]"
+      className="mt-0.5 h-4 w-4 shrink-0 text-[#f07f25]"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
