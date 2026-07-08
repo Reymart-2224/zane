@@ -293,7 +293,7 @@ const pageStyles = {
           className="mb-4 inline-flex text-sm font-semibold opacity-90 transition hover:underline hover:opacity-100"
         >
           ← Back to listings
-        </Link>
+        </Link> 
 
         {companyLogo ? (
           <img
