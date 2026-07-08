@@ -507,7 +507,7 @@ const pageStyles = {
         <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold text-[#111827]">Our Listings</h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-black">
               Explore available listings from {companyName}.
             </p>
           </div>
