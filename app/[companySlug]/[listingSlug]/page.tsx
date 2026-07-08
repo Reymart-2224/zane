@@ -369,7 +369,7 @@ const pageStyles = {
 
       <aside className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-7">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex rounded-full bg-[var(--zl-primary-light)] px-3 py-1 text-xs font-semibold capitalize text-[var(--zl-primary)]">
+          <span className="inline-flex rounded-full bg-[black] px-3 py-1 text-xs font-semibold capitalize text-[white]">
             {listing.listingCategory || "listing"}
           </span>
 
@@ -499,7 +499,7 @@ function MapPinIcon() {
 
 function PesoIcon() {
   return (
-    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--zl-primary-light)] text-xl font-bold text-[var(--zl-primary)]">
+    <span className="flex h-9 w-9 items-center justify-center rounded-full  text-xl font-bold text-[black]">
       ₱
     </span>
   );
