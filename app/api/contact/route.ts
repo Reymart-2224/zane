@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     const { error } = await resend.emails.send({
       from:
         process.env.CONTACT_EMAIL_FROM ||
-        "ZANE IT Solutions <onboarding@resend.dev>",
+        "ZANE IT Solutions <onboarding@zaneitsolutions.com>",
       to: [process.env.CONTACT_EMAIL_TO],
       replyTo: email,
       subject: `New ZANE inquiry from ${name}`,
