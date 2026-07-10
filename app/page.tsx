@@ -152,12 +152,22 @@ export default async function HomePage() {
           >
             Services
           </Link>
+        
           <Link
             href="#solutions"
             className="rounded-xl px-4 py-3 transition hover:bg-white/10 hover:text-white"
           >
             Solutions
           </Link>
+
+              <Link
+            href="#projects"
+            className="rounded-xl px-4 py-3 transition hover:bg-white/10 hover:text-white"
+          >
+            Projects
+          </Link>
+
+          
           <Link
             href="#process"
             className="rounded-xl px-4 py-3 transition hover:bg-white/10 hover:text-white"
