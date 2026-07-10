@@ -353,11 +353,268 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Sample Projects */}
-<section id="projects" className="mx-auto max-w-7xl px-5 py-20 md:px-8">
+    
+
+
+{/* Projects */}
+<section
+  id="projects"
+  className="mx-auto max-w-7xl px-5 py-20 md:px-8"
+>
   <div className="mb-12 max-w-3xl">
     <p className="mb-3 text-sm font-semibold uppercase tracking-[0.35em] text-[#2f8c74]">
-      Sample Projects
+      Recent Projects
+    </p>
+
+    <h2 className="text-3xl font-bold tracking-tight md:text-5xl">
+      Custom websites and digital systems built for real businesses.
+    </h2>
+
+    <p className="mt-5 leading-8 text-white/60">
+      A selection of recent WordPress development projects involving custom
+      development, Advanced Custom Fields, application integrations, performance
+      optimization, conversion improvements, and responsive website builds.
+    </p>
+  </div>
+
+  {/* Featured Projects */}
+  <div className="grid gap-6 lg:grid-cols-3">
+    {[
+      {
+        number: "01",
+        title: "Regroup Mass Notification",
+        url: "https://www.regroup.com/",
+        domain: "regroup.com",
+        industry: "Emergency Communication & Mass Notification Systems",
+        platform: "WordPress, Elementor & ACF",
+        description:
+          "Custom WordPress development using Elementor for flexible page building and Advanced Custom Fields for structured content management. The project also includes SEO implementation and integration with Regroup’s proprietary application and payment systems.",
+        services: [
+          "Custom WordPress",
+          "Elementor",
+          "ACF",
+          "Application Integration",
+          "Payment Integration",
+          "SEO",
+        ],
+      },
+      {
+        number: "02",
+        title: "Digivizer",
+        url: "https://digivizer.com/",
+        domain: "digivizer.com",
+        industry: "Digital Marketing & Analytics Solutions",
+        platform: "WordPress, Elementor & ACF",
+        description:
+          "Custom Elementor WordPress development with Advanced Custom Fields for flexible content management, speed optimization, conversion rate optimization, responsive layouts, and CRM integration.",
+        services: [
+          "Elementor",
+          "ACF",
+          "Speed Optimization",
+          "CRO",
+          "CRM Integration",
+          "Responsive Development",
+        ],
+      },
+      {
+        number: "03",
+        title: "Napier & Blakeley",
+        url: "https://napierblakeley.com/",
+        domain: "napierblakeley.com",
+        industry: "Property & Asset Management Consultancy",
+        platform: "WordPress, Elementor & ACF",
+        description:
+          "A custom-built WordPress website using Elementor and Advanced Custom Fields for dynamic content management. The website includes interactive animations, hover effects, responsive layouts, and performance optimization.",
+        services: [
+          "Custom WordPress",
+          "Elementor",
+          "ACF",
+          "Animations",
+          "Hover Effects",
+          "Speed Optimization",
+        ],
+      },
+    ].map((project) => (
+      <article
+        key={project.title}
+        className="group flex h-full flex-col overflow-hidden rounded-[34px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:border-[#2f8c74]/50 hover:bg-[#2f8c74]/10"
+      >
+        <div className="mb-6 flex items-start justify-between gap-5">
+          <div>
+            <span className="inline-flex rounded-full border border-[#2f8c74]/30 bg-[#2f8c74]/10 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-[#8ff0d1]">
+              Featured Project
+            </span>
+
+            <h3 className="mt-5 text-2xl font-bold text-white">
+              {project.title}
+            </h3>
+
+            <Link
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-block text-sm text-[#8ff0d1] transition hover:text-white"
+            >
+              {project.domain}
+            </Link>
+          </div>
+
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#296589] to-[#2f8c74] text-lg font-black shadow-[0_0_28px_rgba(47,140,116,0.35)]">
+            {project.number}
+          </div>
+        </div>
+
+        <div className="mb-6 space-y-4 rounded-[24px] border border-white/10 bg-[#081827]/70 p-5">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/35">
+              Industry
+            </p>
+            <p className="mt-2 text-sm leading-6 text-white/75">
+              {project.industry}
+            </p>
+          </div>
+
+          <div className="h-px bg-white/10" />
+
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/35">
+              Platform
+            </p>
+            <p className="mt-2 text-sm leading-6 text-white/75">
+              {project.platform}
+            </p>
+          </div>
+        </div>
+
+        <p className="mb-6 flex-1 text-sm leading-7 text-white/60">
+          {project.description}
+        </p>
+
+        <div className="flex flex-wrap gap-2">
+          {project.services.map((service) => (
+            <span
+              key={service}
+              className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs text-white/60"
+            >
+              {service}
+            </span>
+          ))}
+        </div>
+
+        <Link
+          href={project.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-7 flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4 text-sm font-semibold text-white transition hover:border-[#2f8c74]/50 hover:bg-[#2f8c74]/15"
+        >
+          <span>Visit Website</span>
+          <span aria-hidden="true">↗</span>
+        </Link>
+      </article>
+    ))}
+  </div>
+
+  {/* Other Projects */}
+  <div className="mt-20">
+    <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <div>
+        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.35em] text-[#296589]">
+          Other Projects
+        </p>
+
+        <h3 className="text-2xl font-bold md:text-4xl">
+          Additional websites and platforms.
+        </h3>
+      </div>
+
+      <p className="max-w-lg text-sm leading-7 text-white/55">
+        More client projects involving WordPress development, custom layouts,
+        integrations, performance improvements, and ongoing website support.
+      </p>
+    </div>
+
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {[
+        {
+          title: "Mid City Law Firm",
+          domain: "midcitylawfirm.com",
+          url: "https://midcitylawfirm.com/",
+          category: "Legal Services",
+        },
+        {
+          title: "Johnson Law Group",
+          domain: "johnsonlgroup.com",
+          url: "https://www.johnsonlgroup.com/",
+          category: "Legal Services",
+        },
+        {
+          title: "Still Waters Educamp",
+          domain: "stillwaterseducamp.com",
+          url: "https://stillwaterseducamp.com/",
+          category: "Education & Therapy",
+        },
+        {
+          title: "Gjesdahl Law",
+          domain: "gjesdahllaw.com",
+          url: "https://gjesdahllaw.com/",
+          category: "Legal Services",
+        },
+        {
+          title: "The Marketing Project",
+          domain: "themarketingproject.com.au",
+          url: "https://themarketingproject.com.au/",
+          category: "Marketing Agency",
+        },
+        {
+          title: "Inbound Connect",
+          domain: "inboundconnect.com",
+          url: "https://inboundconnect.com/",
+          category: "Marketing & Lead Generation",
+        },
+      ].map((project, index) => (
+        <Link
+          key={project.title}
+          href={project.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group rounded-[28px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:border-[#296589]/60 hover:bg-[#296589]/15"
+        >
+          <div className="flex items-start justify-between gap-5">
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9fdcff]">
+                {project.category}
+              </span>
+
+              <h4 className="mt-4 text-xl font-bold text-white">
+                {project.title}
+              </h4>
+
+              <p className="mt-2 text-sm text-white/45">{project.domain}</p>
+            </div>
+
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-xs font-bold text-white/60 transition group-hover:border-[#296589]/60 group-hover:bg-[#296589]/30 group-hover:text-white">
+              {String(index + 1).padStart(2, "0")}
+            </div>
+          </div>
+
+          <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-5 text-sm font-semibold text-white/60 transition group-hover:text-white">
+            <span>View Project</span>
+            <span className="transition-transform group-hover:translate-x-1">
+              ↗
+            </span>
+          </div>
+        </Link>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+  {/* System Projects */}
+<section className="mx-auto max-w-7xl px-5 py-20 md:px-8">
+  <div className="mb-12 max-w-3xl">
+    <p className="mb-3 text-sm font-semibold uppercase tracking-[0.35em] text-[#2f8c74]">
+      System Projects
     </p>
 
     <h2 className="text-3xl font-bold tracking-tight md:text-5xl">
@@ -492,6 +749,7 @@ export default async function HomePage() {
     </div>
   </div>
 </section>
+
 
 
       {/* Solutions */}
